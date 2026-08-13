@@ -181,7 +181,7 @@ def reduce(
     ].sort_values("delta", kind="stable")
     kinase_proteins = kinase_protein_summary(kinase_sites)
     config = load_config(config_path)
-    base_seed = int(config.values["randomness"]["manuscript_base_seed"])
+    base_seed = int(config.values["randomness"]["analysis_base_seed"])
     draws = int(config.values["randomness"]["figure_bootstrap_draws"])
     local = pd.read_csv(prepared_dir / "local_opportunity.csv")
     nested = pd.read_csv(prepared_dir / "nested_nulls.csv")

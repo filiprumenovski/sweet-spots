@@ -1,1 +1,1 @@
-"""Scientific estimands and manuscript analyses."""
+"""Scientific estimands and publication analyses."""

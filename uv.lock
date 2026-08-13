@@ -919,63 +919,6 @@ wheels = [
 ]
 
 [[package]]
-name = "oglcnac-regional-code-paper"
-version = "1.0.0"
-source = { editable = "." }
-dependencies = [
-    { name = "biopython" },
-    { name = "duckdb" },
-    { name = "kinase-library" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "pillow" },
-    { name = "polars" },
-    { name = "pyarrow" },
-    { name = "pypdf" },
-    { name = "pyyaml" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "snakemake" },
-    { name = "snakemake-executor-plugin-slurm" },
-    { name = "statsmodels" },
-    { name = "xlsxwriter" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "biopython", specifier = "==1.85" },
-    { name = "duckdb", specifier = "==1.5.2" },
-    { name = "kinase-library", specifier = "==1.7.1" },
-    { name = "matplotlib", specifier = "==3.8.4" },
-    { name = "numpy", specifier = "==2.4.3" },
-    { name = "pandas", specifier = "==3.0.1" },
-    { name = "pillow", specifier = "==11.3.0" },
-    { name = "polars", specifier = "==1.39.0" },
-    { name = "pyarrow", specifier = "==23.0.1" },
-    { name = "pypdf", specifier = "==6.0.0" },
-    { name = "pyyaml", specifier = "==6.0.2" },
-    { name = "scikit-learn", specifier = "==1.8.0" },
-    { name = "scipy", specifier = "==1.17.1" },
-    { name = "snakemake", specifier = "==9.17.1" },
-    { name = "snakemake-executor-plugin-slurm", specifier = "==2.0.3" },
-    { name = "statsmodels", specifier = "==0.14.6" },
-    { name = "xlsxwriter", specifier = "==3.2.9" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pytest", specifier = "==8.4.1" },
-    { name = "ruff", specifier = "==0.12.8" },
-]
-
-[[package]]
 name = "openpyxl"
 version = "3.1.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1838,6 +1781,63 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/81/68/dddd76117df2ef14c943c6bbb6618be5c9401280046f4ddfc9fb4596a1b8/statsmodels-0.14.6-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:19b58cf7474aa9e7e3b0771a66537148b2df9b5884fbf156096c0e6c1ff0469d", size = 10339446, upload-time = "2025-12-05T23:10:28.503Z" },
     { url = "https://files.pythonhosted.org/packages/56/4a/dce451c74c4050535fac1ec0c14b80706d8fc134c9da22db3c8a0ec62c33/statsmodels-0.14.6-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:81e7dcc5e9587f2567e52deaff5220b175bf2f648951549eae5fc9383b62bc37", size = 10368705, upload-time = "2025-12-05T23:10:44.339Z" },
     { url = "https://files.pythonhosted.org/packages/60/15/3daba2df40be8b8a9a027d7f54c8dedf24f0d81b96e54b52293f5f7e3418/statsmodels-0.14.6-cp312-cp312-win_amd64.whl", hash = "sha256:b5eb07acd115aa6208b4058211138393a7e6c2cf12b6f213ede10f658f6a714f", size = 9543991, upload-time = "2025-12-05T23:10:58.536Z" },
+]
+
+[[package]]
+name = "sweet-spots-reproducibility"
+version = "1.0.0"
+source = { editable = "." }
+dependencies = [
+    { name = "biopython" },
+    { name = "duckdb" },
+    { name = "kinase-library" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "pillow" },
+    { name = "polars" },
+    { name = "pyarrow" },
+    { name = "pypdf" },
+    { name = "pyyaml" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "snakemake" },
+    { name = "snakemake-executor-plugin-slurm" },
+    { name = "statsmodels" },
+    { name = "xlsxwriter" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "biopython", specifier = "==1.85" },
+    { name = "duckdb", specifier = "==1.5.2" },
+    { name = "kinase-library", specifier = "==1.7.1" },
+    { name = "matplotlib", specifier = "==3.8.4" },
+    { name = "numpy", specifier = "==2.4.3" },
+    { name = "pandas", specifier = "==3.0.1" },
+    { name = "pillow", specifier = "==11.3.0" },
+    { name = "polars", specifier = "==1.39.0" },
+    { name = "pyarrow", specifier = "==23.0.1" },
+    { name = "pypdf", specifier = "==6.0.0" },
+    { name = "pyyaml", specifier = "==6.0.2" },
+    { name = "scikit-learn", specifier = "==1.8.0" },
+    { name = "scipy", specifier = "==1.17.1" },
+    { name = "snakemake", specifier = "==9.17.1" },
+    { name = "snakemake-executor-plugin-slurm", specifier = "==2.0.3" },
+    { name = "statsmodels", specifier = "==0.14.6" },
+    { name = "xlsxwriter", specifier = "==3.2.9" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = "==8.4.1" },
+    { name = "ruff", specifier = "==0.12.8" },
 ]
 
 [[package]]

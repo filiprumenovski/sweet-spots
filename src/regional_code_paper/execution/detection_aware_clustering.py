@@ -175,7 +175,7 @@ def reduce(
     if len(per_protein) % len(RADII):
         raise ValueError("detection-aware output does not cover every radius")
 
-    base_seed = int(config.values["randomness"]["manuscript_base_seed"])
+    base_seed = int(config.values["randomness"]["analysis_base_seed"])
     bootstrap_draws = int(config.values["randomness"]["bootstrap_draws"])
     rows: list[dict[str, object]] = []
     for radius, all_proteins in per_protein.groupby("radius", sort=True):

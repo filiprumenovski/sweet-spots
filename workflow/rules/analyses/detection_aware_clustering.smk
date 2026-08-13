@@ -47,7 +47,7 @@ rule detection_aware_clustering_shard:
         "simulate --proteins {input.proteins:q} --strata {input.strata:q} "
         "--shard {wildcards.shard} --shards {config[parallel][detection_null_shards]} "
         "--draws {config[randomness][detection_null_draws]} "
-        "--seed {config[randomness][manuscript_base_seed]} --output {output.data:q} "
+        "--seed {config[randomness][analysis_base_seed]} --output {output.data:q} "
         "--receipt {output.receipt:q} > {log:q} 2>&1"
 
 

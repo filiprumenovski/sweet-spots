@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "Sweet spots: reproducibility workflow"
+type: software
+authors:
+  - family-names: Rumenovski
+    given-names: Filip
+repository-code: "https://github.com/filiprumenovski/sweet-spots"
+url: "https://github.com/filiprumenovski/sweet-spots"
+version: 1.0.0
+date-released: 2026-08-13
+license: MIT
+keywords:
+  - O-GlcNAc
+  - glycosylation
+  - regional sequence code
+  - computational biology
+  - reproducible research

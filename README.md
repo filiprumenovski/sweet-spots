@@ -1,219 +1,138 @@
-# Sweet spots: reproducibility code
+# Sweet spots
 
-This repository is the paper-only computational record for *Sweet spots: how a
-promiscuous glycosyltransferase reads a conserved regional code*. It rebuilds
-the consensus region object, every load-bearing analysis retained in the Cell
-Systems manuscript, all main and supplemental figures, a tidy result ledger,
-and a final numerical and figure-integrity audit.
+[![Release](https://img.shields.io/github/v/release/filiprumenovski/sweet-spots?display_name=tag&sort=semver)](https://github.com/filiprumenovski/sweet-spots/releases)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
+[![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
-Exploratory, retired, disease, network, LLPS, stoichiometry, and legacy cassette
-analyses from the parent research repository are intentionally absent.
+Reproducible analyses for *Sweet spots: how a promiscuous glycosyltransferase
+reads a conserved regional code*.
 
-## Input data
+This repository rebuilds the consensus O-GlcNAc region catalogue, every
+reported computational analysis, five main and three supplemental figures, a
+machine-readable result ledger, and the terminal integrity audit. Retained
+results are included for immediate inspection; the Snakemake workflow recreates
+them from frozen inputs.
 
-The workflow starts from a frozen, analysis-ready data bundle. The openly
-redistributable portion is published as a versioned GitHub Release asset. From
-the repository root, install and checksum it with:
+<p align="center">
+  <img src="results/figures/Figure_1.png" width="100%" alt="O-GlcNAc sites form reproducible regional clusters across proteins and spatial scales">
+</p>
 
-```bash
-./scripts/fetch_open_inputs.sh
-```
+## Quick start
 
-This creates the expected `inputs/` tree. Three source files are deliberately
-not redistributed because their providers do not give an explicit public
-redistribution grant: the O-GlcNAcAtlas evidence table, the MSU/RGAP rice
-sequence subset, and the unified PTM catalogue containing PhosphoSitePlus
-records. Place licensed copies at the paths marked **user supplied** below.
-See [`docs/input_data.md`](docs/input_data.md) for exact versions, byte counts,
-hashes, source links, and the redistribution decision.
-
-`source_root` in `config/config.yaml` must point to a directory with the
-following files:
-
-| Path below `source_root` | Contents | Used for |
-|---|---|---|
-| `data/interim/fasta_human.parquet` | Canonical human protein sequence spine | Consensus regions, self-clustering, regional models |
-| `data/interim/fasta_all.parquet` | Canonical multispecies protein sequence spine | Scanner validation, evolutionary transfer, FG-NUP background |
-| `data/interim/iupred_residue_scores.parquet` | Residue-level IUPred disorder scores | Covariate control, scanner features, matched FG-NUP analysis |
-| `analysis/revalidation/data/atlas_unambiguous.csv` **(user supplied)** | Strict sequence-validated O-GlcNAc site evidence with species and publication support | Region definition, labels, evolutionary comparisons |
-| `data/processed/landscape/ptm_unified.parquet` **(user supplied)** | Canonical O-GlcNAc, phosphorylation, acetylation, and ubiquitination site catalogue | Self-clustering and O-GlcNAc/phosphorylation analyses |
-| `data/processed/regions/oglcnac_consensus_regions.parquet` | Archived canonical consensus-region object | Independent checksum comparison of the rebuilt object |
-| `data/interim/msa/*.afa` | Per-protein human-to-ortholog alignments | Alignment-based site and regional conservation |
-| `data/external/multispecies_oglcnac/rice_sequences.fasta` **(user supplied)** | Rice sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
-| `data/external/multispecies_oglcnac/arabidopsis_sequences.fasta` | Arabidopsis sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
-| `data/external/multispecies_oglcnac/drosophila_sequences.fasta` | Drosophila sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
-| `data/external/multispecies_oglcnac/celegans_sequences.fasta` | *C. elegans* sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
-| `analysis/revalidation/data/ogt_orthologs/O15294.fasta` | Human OGT sequence | Mapping structural residues to the canonical sequence |
-| `analysis/revalidation/data/ogt_orthologs/orthologs_aln.fasta` | OGT ortholog alignment | Conservation of substrate-reading and catalytic surfaces |
-| `analysis/revalidation/data/ogt_structures/*.cif` | Experimentally determined OGT structures | Peptide-contact, surface, core, and interface assignments |
-
-The complete frozen input contract is 235,806,555 bytes. The open release asset
-installs 221,552,078 bytes, including 16,450 per-protein ortholog alignments and
-44 OGT structure files. The three user-supplied files total 14,254,477 bytes.
-Kinase specificity matrices are supplied by the pinned
-`kinase-library==1.7.1` dependency rather than by a separate data file.
-The first workflow rule verifies that every required path exists and writes
-relative paths, byte counts, SHA-256 hashes, and directory-tree hashes to
-`results/provenance/input_manifest.json`. This manifest is the authoritative
-identity record for the frozen bundle. The ambiguous-site atlas, raw downloads,
-and all retired intermediate products are deliberately outside the input
-contract.
-
-Validate and fingerprint the input bundle without launching an analysis:
+Requirements are Python 3.12, [uv](https://docs.astral.sh/uv/), and a POSIX
+shell. DuckDB, Snakemake, and all Python dependencies are pinned in `uv.lock`.
 
 ```bash
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/local \
-  results/provenance/input_manifest.json
-```
-
-Expected layout:
-
-```text
-source_root/
-├── analysis/revalidation/data/
-│   ├── atlas_unambiguous.csv
-│   ├── ogt_orthologs/{O15294.fasta,orthologs_aln.fasta}
-│   └── ogt_structures/*.cif
-└── data/
-    ├── external/multispecies_oglcnac/*_sequences.fasta
-    ├── interim/{fasta_human.parquet,fasta_all.parquet,iupred_residue_scores.parquet}
-    ├── interim/msa/*.afa
-    ├── processed/landscape/ptm_unified.parquet
-    └── processed/regions/oglcnac_consensus_regions.parquet
-```
-
-## Run
-
-The workflow expects the frozen analysis-ready data tree named by
-`config/config.yaml`. By default, it looks under `inputs/`. For an archive or a
-reviewer machine, either unpack the bundle there or change only `source_root`
-to the unpacked data directory.
-
-```bash
+git clone https://github.com/filiprumenovski/sweet-spots.git
 cd sweet-spots
-uv sync --frozen
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/local
+make install
+make inputs
 ```
 
-The local profile defaults to four concurrent cores and a 32 GB aggregate
-memory budget. Override either explicitly for a larger workstation, for example
-`--cores 16 --resources mem_mb=96000`. The cluster profile can submit up to 128
-independent jobs and lets SLURM enforce each rule's declared resources.
+`make inputs` downloads and verifies the 127 MB open-data release. Three
+licensed inputs cannot be republished and must be supplied separately. Their
+exact locations, versions, sizes, hashes, and provider links are listed in the
+[input data guide](docs/input_data.md).
 
-On a SLURM cluster, set any site-specific account/partition flags on the command
-line or in a private profile layered over the included portable defaults:
+Once the complete `inputs/` tree is present:
+
+```bash
+make validate-inputs  # verify every input digest
+make dry-run          # inspect the complete execution plan
+make reproduce        # run all analyses, figures, tables, and audits
+```
+
+The workstation profile uses four cores and a 32 GB aggregate memory ceiling.
+For larger systems, pass Snakemake options through `SNAKEMAKE_ARGS`:
+
+```bash
+make reproduce SNAKEMAKE_ARGS="--cores 16 --resources mem_mb=96000"
+```
+
+The included SLURM profile submits independent shards while respecting each
+rule's declared CPU, memory, disk, and runtime requirements:
 
 ```bash
 uv run snakemake --snakefile workflow/Snakefile --profile profiles/slurm
 ```
 
-For a clean-room rerun:
+## Outputs
 
-```bash
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/local --delete-all-output
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/local
-```
+All generated products live below `results/`; source inputs are treated as
+immutable.
 
-Snakemake treats the source tree as immutable. All generated files live under
-`results/`. The principal products are:
+| Product | Description |
+|---|---|
+| [`results/analysis/`](results/analysis/) | Transparent CSV and JSON output from each analysis |
+| [`results/figures/`](results/figures/) | Vector PDF and 400 dpi PNG for every retained figure |
+| [`results/tables/manuscript_result_ledger.parquet`](results/tables/manuscript_result_ledger.parquet) | One row per reported estimand, materialized with DuckDB |
+| [`results/provenance/input_manifest.json`](results/provenance/input_manifest.json) | File hashes and directory-tree hashes for every frozen input |
+| [`results/audit/reproduction_report.json`](results/audit/reproduction_report.json) | Final numerical and figure-integrity checks |
 
-- `results/tables/manuscript_result_ledger.parquet`: one row per manuscript-facing
-  estimand, materialised with the DuckDB CLI and Zstandard compression.
-- `results/figures/`: vector PDF and 400 dpi PNG for five main and three
-  supplemental figures.
-- `results/audit/reproduction_report.json`: numerical and figure-integrity
-  checks.
-- `results/provenance/input_manifest.json`: SHA-256 hashes of every
-  analysis-ready input.
+The retained audit reports `reproduced`; the figure manifest records the byte
+size and SHA-256 digest of every rendered PDF and PNG.
 
-## Design boundaries
+## Reproducibility design
 
-Every stochastic split is grouped by protein. Model selection and score
-threshold calibration for the regional scanner occur within outer-training
-partitions. The held-out outer fold is used once. Bootstrap and permutation
-resampling preserve proteins as the inferential unit unless a result is
-explicitly structural or catalogue-level.
+- Protein-grouped outer folds isolate model assessment from model selection and
+  threshold calibration.
+- Protein-level bootstrap and permutation procedures preserve the biological
+  unit of inference.
+- Expensive simulations, kinase scoring, and model fitting use deterministic
+  map/reduce shards that can be resumed safely.
+- Writers commit atomically; reducers reject missing shards, duplicate keys,
+  schema drift, altered digests, and incomplete fold coverage.
+- Figures consume declared workflow products rather than transcribed values.
 
-Python modules exchange transparent CSV and JSON products. Parquet
-materialisation is performed only by the DuckDB CLI rule, keeping the binary
-storage operation declarative and reviewable. Figure code consumes only files
-declared in the Snakemake DAG and never types a result from the manuscript.
+Changing the number of shards changes scheduling, not record ownership, random
+seeds, or numerical results. The full contract is described in the
+[workflow architecture](docs/architecture.md).
 
-## Repository layout
+## Repository map
 
 ```text
 sweet-spots/
-├── config/                   # validated scientific and execution parameters
-├── docs/                     # architecture and failure guarantees
-├── profiles/                 # portable local and SLURM execution defaults
-├── results/                  # retained reviewer-facing artifacts only
+├── config/                 validated scientific and execution parameters
+├── docs/                   data, methods, and architecture documentation
+├── profiles/               local and SLURM execution profiles
+├── results/                retained analyses, figures, tables, and audit
+├── scripts/                input installation utilities
 ├── src/regional_code_paper/
-│   ├── analysis/             # scientific estimands
-│   ├── core/                 # configuration, randomness, atomic I/O
-│   ├── execution/            # restartable map/reduce commands
-│   ├── models/               # feature extraction and predictive models
-│   ├── reporting/            # manifests, figures, ledgers, audits
-│   └── sql/                  # declarative DuckDB analyses
-├── tests/unit/               # tests mirror the source architecture
-└── workflow/                 # Snakemake DAG and domain-specific rules
+│   ├── analysis/           scientific estimands
+│   ├── core/               configuration, randomness, and atomic I/O
+│   ├── execution/          restartable map/reduce commands
+│   ├── models/             features and grouped predictive models
+│   ├── reporting/          figures, manifests, ledgers, and audits
+│   └── sql/                declarative DuckDB analyses
+├── tests/unit/             focused numerical and workflow-contract tests
+└── workflow/               Snakemake DAG and domain-specific rules
 ```
 
-## Parallel architecture
+## Documentation
 
-The domain-specific rule files in `workflow/rules/` mirror the paper's dependency
-structure. Expensive stages use explicit map/reduce boundaries:
+| Guide | Contents |
+|---|---|
+| [Input data](docs/input_data.md) | Frozen data contract, licenses, hashes, and installation |
+| [Workflow architecture](docs/architecture.md) | Parallel execution, determinism, and failure behavior |
+| [Clustering breadth](docs/clustering_breadth.md) | Estimands, conditioned null, and inferential guardrails |
+| [Execution profiles](profiles/README.md) | Workstation and SLURM configuration |
+| [Result archive](results/README.md) | Structure of the retained computational products |
 
-- self-clustering maps independently over the four PTMs;
-- the peptide-exposure-conditioned clustering null maps proteins over
-  configurable shards;
-- regional prediction maps over five protein-grouped outer folds;
-- kinase-library scoring maps matched peptide pairs over configurable shards;
-- scanner validation maps five outer folds, while keeping feature extraction in
-  one shared, immutable cache.
-
-Shard counts live in `config/config.yaml`. They affect scheduling only. Record
-ownership uses a sorted global index, and random seeds use that same global
-index, so a 4-shard and a 64-shard run target the same numerical result.
-
-Every map job commits outputs atomically and then writes a receipt containing
-row count, byte count, and SHA-256. Reducers fail closed on missing receipts,
-duplicate keys, schema drift, or incomplete fold coverage. Each expensive job
-also has a separate log and Snakemake benchmark file. Interrupted jobs can be
-resubmitted safely with `--rerun-incomplete`; completed shards are not repeated.
-The complete map/reduce contract and failure model are documented in
-[`docs/architecture.md`](docs/architecture.md).
-The rationale, fixed endpoints and reporting guardrails for the clustering
-breadth redesign are documented in
-[`docs/clustering_breadth_redesign.md`](docs/clustering_breadth_redesign.md).
-
-Before spending compute, inspect the resolved graph:
+## Development
 
 ```bash
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/local --dry-run
-uv run snakemake --snakefile workflow/Snakefile --rulegraph | dot -Tpdf > dag.pdf
+make check
 ```
 
-Quality gates are intentionally ordinary:
+This runs Ruff, the unit test suite, and the lockfile consistency check. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the review contract.
 
-```bash
-uv run --group dev ruff check src tests
-uv run --group dev pytest -q
-uv lock --check
-uv run snakemake --snakefile workflow/Snakefile --dry-run --forceall --cores 32
-```
+## Citation and license
 
-Snakemake's generic linter recommends a per-rule Conda environment. This repo
-deliberately uses one exact, checked-in `uv.lock` instead: every rule invokes
-`uv run --frozen`, so dependency drift fails rather than being resolved during
-a job. The SLURM executor plugin is pinned in that same lock.
+Use the repository's `CITATION.cff` metadata or GitHub's **Cite this repository**
+menu to cite this software release.
 
-## Audit-sensitive distinctions
-
-The consensus object contains 824 regions on 477 region-bearing proteins;
-3,535 is the validated scanner universe. The strict self-clustering cohort
-contains 12,491 validated sites, whereas 12,501 belongs to a different scanner
-input universe. The final audit fails these common unit substitutions.
-
-The archived self-clustering resampling uses seed 20260814. Other stochastic
-analyses derive deterministic analysis-specific seeds from base seed 42. Both
-values are exposed in `config/config.yaml` and in result provenance.
+The analysis code is available under the [MIT License](LICENSE). Input data
+retain the licenses and access conditions of their original providers; see the
+[data provenance and licensing table](docs/input_data.md).

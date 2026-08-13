@@ -35,7 +35,7 @@ def prepare(
 ) -> None:
     config = load_config(config_path)
     inputs = load_inputs(config_path, regions_path, sites_path)
-    base_seed = int(config.values["randomness"]["manuscript_base_seed"])
+    base_seed = int(config.values["randomness"]["analysis_base_seed"])
     tiles = build_tiles(inputs).reset_index(drop=True)
     tiles.insert(0, "row_id", np.arange(len(tiles)))
     feature_names = sorted(
@@ -114,7 +114,7 @@ def reduce(
     output_dir: Path,
 ) -> None:
     config = load_config(config_path)
-    base_seed = int(config.values["randomness"]["manuscript_base_seed"])
+    base_seed = int(config.values["randomness"]["analysis_base_seed"])
     figure_draws = int(config.values["randomness"]["figure_bootstrap_draws"])
     if len(fold_paths) != 5 or len(fold_receipts) != 5:
         raise ValueError("regional-code prediction requires exactly five fold shards")

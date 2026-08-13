@@ -197,7 +197,7 @@ def analyze(config_path: Path, output_dir: Path) -> None:
     )
     proteins = protein_table(sequences, maps)
     draws = int(config.values["randomness"]["bootstrap_draws"])
-    base_seed = int(config.values["randomness"]["manuscript_base_seed"])
+    base_seed = int(config.values["randomness"]["analysis_base_seed"])
     scales = summarize(proteins, draws, base_seed)
     primary = scales.loc[scales.radius.eq(PRIMARY_RADIUS)].set_index("restriction")
     write_csv(output_dir / "per_protein.csv", proteins)

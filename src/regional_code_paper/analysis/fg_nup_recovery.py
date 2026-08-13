@@ -172,7 +172,7 @@ def main() -> None:
     table = protein_table(args.config, args.regions)
     matched, matched_p = matched_background(
         table,
-        seed=stable_seed(int(config.values["randomness"]["manuscript_base_seed"]), "fg_nup"),
+        seed=stable_seed(int(config.values["randomness"]["analysis_base_seed"]), "fg_nup"),
     )
     design = pd.DataFrame(
         {

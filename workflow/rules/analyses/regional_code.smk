@@ -53,7 +53,7 @@ rule regional_code_fold:
         "OMP_NUM_THREADS={threads} OPENBLAS_NUM_THREADS={threads} "
         "uv run --frozen python -m regional_code_paper.execution.regional_code fold "
         "--cache {input.cache:q} --fold {wildcards.fold} "
-        "--seed {config[randomness][manuscript_base_seed]} --output {output.data:q} "
+        "--seed {config[randomness][analysis_base_seed]} --output {output.data:q} "
         "--receipt {output.receipt:q} > {log:q} 2>&1"
 
 

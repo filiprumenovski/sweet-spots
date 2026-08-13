@@ -4,7 +4,6 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 archive_name="sweet-spots-open-inputs-v1.tar.gz"
-archive_path="${TMPDIR:-/tmp}/${archive_name}"
 archive_url="https://github.com/filiprumenovski/sweet-spots/releases/download/inputs-v1/${archive_name}"
 expected_sha256="4010a15610f2a8d62c5f6ae0728249bf6f21353e42477ebfd359cb8d4c0fd3e8"
 
@@ -16,6 +15,12 @@ command -v sha256sum >/dev/null || {
     printf '%s\n' "sha256sum is required to verify ${archive_name}." >&2
     exit 1
 }
+
+archive_path="$(mktemp "${TMPDIR:-/tmp}/sweet-spots-inputs.XXXXXX.tar.gz")"
+cleanup() {
+    rm -f -- "${archive_path}"
+}
+trap cleanup EXIT
 
 printf 'Downloading %s\n' "${archive_url}"
 curl --fail --location --retry 3 --output "${archive_path}" "${archive_url}"

@@ -1,11 +1,11 @@
-"""Paper-only workflow for the O-GlcNAc regional-code manuscript.
+"""Reproducibility workflow for the O-GlcNAc regional sequence code.
 
 Run from the repository root with:
 
     uv run snakemake --snakefile workflow/Snakefile --profile profiles/local
 
-The DAG deliberately excludes every retired, exploratory, disease, LLPS,
-stoichiometry, network, and legacy cassette analysis in the parent project.
+The DAG contains the analyses and reporting products in the public scientific
+record. Exploratory work is outside this workflow's declared scope.
 """
 
 configfile: "config/config.yaml"

@@ -12,9 +12,9 @@ properties:
   results_root: {const: results}
   randomness:
     type: object
-    required: [manuscript_base_seed, archived_clustering_seed, bootstrap_draws, figure_bootstrap_draws, detection_null_draws]
+    required: [analysis_base_seed, archived_clustering_seed, bootstrap_draws, figure_bootstrap_draws, detection_null_draws]
     properties:
-      manuscript_base_seed: {type: integer, minimum: 0}
+      analysis_base_seed: {type: integer, minimum: 0}
       archived_clustering_seed: {const: 20260814}
       bootstrap_draws: {type: integer, minimum: 100}
       figure_bootstrap_draws: {type: integer, minimum: 100}

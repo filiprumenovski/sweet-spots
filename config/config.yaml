@@ -7,7 +7,7 @@ source_root: inputs
 results_root: results
 
 randomness:
-  manuscript_base_seed: 42
+  analysis_base_seed: 42
   archived_clustering_seed: 20260814
   bootstrap_draws: 20000
   figure_bootstrap_draws: 10000

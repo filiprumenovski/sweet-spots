@@ -531,7 +531,7 @@ def render_report(
             "",
             "## Direct O-GlcNAc contrasts on the same proteins",
             "",
-            "The load-bearing comparison is the fold-enrichment ratio, recomputed in",
+            "The primary comparison is the fold-enrichment ratio, recomputed in",
             "20,000 joint matched-protein bootstrap samples. No sites are pooled as",
             "independent observations.",
             "",

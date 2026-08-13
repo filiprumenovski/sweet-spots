@@ -405,7 +405,7 @@ def main() -> None:
     config = load_config(args.config)
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    base_seed = int(config.values["randomness"]["manuscript_base_seed"])
+    base_seed = int(config.values["randomness"]["analysis_base_seed"])
     inputs = load_evolution_inputs(config.source_root, args.regions, args.sites)
 
     conservation = site_conservation(inputs)
