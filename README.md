@@ -1,6 +1,6 @@
 # Sweet spots
 
-[![Release: v1.0.1](https://img.shields.io/badge/release-v1.0.1-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.1)
+[![Release: v1.0.2](https://img.shields.io/badge/release-v1.0.2-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.2)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)

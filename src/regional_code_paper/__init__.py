@@ -1,3 +1,3 @@
 """Reproducible analyses for the O-GlcNAc regional sequence code."""
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
