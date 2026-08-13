@@ -1,0 +1,37 @@
+{
+  "analysis_population": {
+    "exposure_strata": 5837,
+    "mapped_peptide_sites": 7917,
+    "proteins": 1057,
+    "sites": 9283,
+    "tryptic_fallback_sites": 1366,
+    "variable_sites": 4884
+  },
+  "conditioning": "same protein, residue identity, and exact observed peptide-coverage signature",
+  "informative_population": "proteins whose conditioned null has nonzero close-pair variance",
+  "interpretation": "Post hoc detection-bias sensitivity analysis; the primary endpoint was fixed at 10 residues before running this implementation.",
+  "primary": {
+    "all_protein_group_fold": 1.051457170797522,
+    "group_fold": 1.1029431670402714,
+    "group_fold_ci_high": 1.1364428970318587,
+    "group_fold_ci_low": 1.0696034998640114,
+    "mean_effect": 0.02796234982315277,
+    "mean_effect_ci_high": 0.03699996576822386,
+    "mean_effect_ci_low": 0.018924733878081676,
+    "mean_null_close_pair_fraction": 0.2716290029450315,
+    "mean_observed_close_pair_fraction": 0.29959135276818427,
+    "n_all_proteins": 1057,
+    "n_degenerate_null_proteins": 485,
+    "n_positive_excess": 382,
+    "n_proteins": 572,
+    "n_sites": 7152,
+    "population_t_p_greater": 1.1195448352986374e-09,
+    "positive_excess_fraction": 0.6678321678321678,
+    "positive_excess_fraction_ci_high": 0.7051976819119157,
+    "positive_excess_fraction_ci_low": 0.6282274250493132,
+    "radius": 10,
+    "resampling_unit": "protein"
+  },
+  "primary_radius": 10,
+  "site_count_preserved": true
+}

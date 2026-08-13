@@ -1,0 +1,57 @@
+{
+  "all_scales": {
+    "criterion": "positive_oglcnac_excess_at_every_radius",
+    "fraction": 0.783349101229896,
+    "fraction_ci_high": 0.8071345203895411,
+    "fraction_ci_low": 0.757511586735543,
+    "n_proteins": 1057,
+    "n_successes": 828,
+    "radii": "5;10;15;20;25;30",
+    "universe": "all_eligible_residues"
+  },
+  "estimand": "protein-population prevalence of positive excess over the exact fixed-count residue-opportunity expectation",
+  "interpretation": "Descriptive protein-population breadth; sensitivity radii are not independent tests.",
+  "matched_oglcnac_dominance": {
+    "contrast": "oglcnac_excess_greater_than_phospho",
+    "fraction": 0.8356164383561644,
+    "fraction_ci_high": 0.8570743280251633,
+    "fraction_ci_low": 0.8116449892742416,
+    "mean_paired_excess_difference": 0.22673694554933627,
+    "median_paired_excess_difference": 0.16976911976911974,
+    "n_proteins": 1022,
+    "n_successes": 854,
+    "radius": 10,
+    "universe": "all_eligible_residues"
+  },
+  "observed_residue_sensitivity": {
+    "fraction": 0.8607108549471661,
+    "fraction_ci_high": 0.8804212356007789,
+    "fraction_ci_low": 0.8383480988852864,
+    "group_fold": 3.999225572199135,
+    "mean_excess": 0.2283974979500347,
+    "mean_null_close_pair_fraction": 0.07615215743261547,
+    "mean_observed_close_pair_fraction": 0.3045496553826502,
+    "median_excess": 0.1702741702741702,
+    "n_proteins": 1041,
+    "n_successes": 896,
+    "ptm": "oglcnac",
+    "radius": 10,
+    "universe": "observed_residue_union"
+  },
+  "primary": {
+    "fraction": 0.8694418164616841,
+    "fraction_ci_high": 0.888422371319109,
+    "fraction_ci_low": 0.8477856581711926,
+    "group_fold": 8.91051651013637,
+    "mean_excess": 0.2745000014634576,
+    "mean_null_close_pair_fraction": 0.03470064200128008,
+    "mean_observed_close_pair_fraction": 0.3092006434647377,
+    "median_excess": 0.2254269780411293,
+    "n_proteins": 1057,
+    "n_successes": 919,
+    "ptm": "oglcnac",
+    "radius": 10,
+    "universe": "all_eligible_residues"
+  },
+  "primary_radius": 10
+}

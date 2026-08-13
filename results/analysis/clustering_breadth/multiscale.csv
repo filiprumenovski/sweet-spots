@@ -1,0 +1,5 @@
+universe,criterion,radii,n_proteins,n_successes,fraction,fraction_ci_low,fraction_ci_high
+all_eligible_residues,oglcnac_excess_greater_than_phospho_at_every_radius,5;10;15;20;25;30,1022,735,0.7191780821917808,0.6908445134927054,0.7458701427028241
+all_eligible_residues,positive_oglcnac_excess_at_every_radius,5;10;15;20;25;30,1057,828,0.783349101229896,0.757511586735543,0.8071345203895411
+observed_residue_union,oglcnac_excess_greater_than_phospho_at_every_radius,5;10;15;20;25;30,959,689,0.7184567257559958,0.6891635880824427,0.7460067051797512
+observed_residue_union,positive_oglcnac_excess_at_every_radius,5;10;15;20;25;30,1041,788,0.7569644572526417,0.7299952330187263,0.7820441730399221

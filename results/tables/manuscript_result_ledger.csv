@@ -1,0 +1,82 @@
+claim_id,figure_panel,analysis,estimand,value,ci_low,ci_high,unit,inferential_unit,source_file
+clustering.r10,1B;1C,self_clustering,O-GlcNAc to phosphorylation close-pair fold ratio,4.073557885388374,3.804939256935024,4.351365689493216,fold,protein,results/analysis/self_clustering/fold_ratios.csv
+clustering.r15,1B;1C,self_clustering,O-GlcNAc to phosphorylation close-pair fold ratio,3.5464034700349494,3.325472296993893,3.779675957249143,fold,protein,results/analysis/self_clustering/fold_ratios.csv
+clustering.r20,1B;1C,self_clustering,O-GlcNAc to phosphorylation close-pair fold ratio,3.173224750442905,2.989267704009245,3.365891264912457,fold,protein,results/analysis/self_clustering/fold_ratios.csv
+clustering.r25,1B;1C,self_clustering,O-GlcNAc to phosphorylation close-pair fold ratio,2.8839753685424623,2.726418160248224,3.048176434918784,fold,protein,results/analysis/self_clustering/fold_ratios.csv
+clustering.r30,1B;1C,self_clustering,O-GlcNAc to phosphorylation close-pair fold ratio,2.698340814664465,2.5580846649291624,2.843341870177893,fold,protein,results/analysis/self_clustering/fold_ratios.csv
+clustering.r5,1B;1C,self_clustering,O-GlcNAc to phosphorylation close-pair fold ratio,4.779501245854044,4.402334404993703,5.178748727028228,fold,protein,results/analysis/self_clustering/fold_ratios.csv
+clustering_breadth.all_scales_positive_fraction,1F,clustering_breadth,fraction with positive O-GlcNAc excess at every tested radius,0.783349101229896,0.757511586735543,0.8071345203895411,fraction,protein,results/analysis/clustering_breadth/summary.json
+clustering_breadth.matched_dominance_fraction,1F,clustering_breadth,fraction of matched proteins with greater O-GlcNAc than phospho excess,0.8356164383561644,0.8116449892742416,0.8570743280251633,fraction,protein,results/analysis/clustering_breadth/summary.json
+clustering_breadth.observed_union_positive_fraction,1F,clustering_breadth,positive-excess fraction under observed-residue opportunities,0.8607108549471661,0.8383480988852864,0.8804212356007789,fraction,protein,results/analysis/clustering_breadth/summary.json
+clustering_breadth.primary_positive_fraction,1F,clustering_breadth,fraction of proteins with positive O-GlcNAc clustering excess,0.8694418164616841,0.8477856581711926,0.888422371319109,fraction,protein,results/analysis/clustering_breadth/summary.json
+deletion.first_below_null_percent,1F,adversarial_deletion,first_below_null_percent,78.3349101229896,,,percent removed,protein,results/analysis/adversarial_deletion/summary.csv
+deletion.fold_after_50_percent,1F,adversarial_deletion,fold_after_50_percent,3.647493543113709,,,fold,protein,results/analysis/adversarial_deletion/summary.csv
+deletion.full_fold,1F,adversarial_deletion,full_fold,8.910516510136445,,,fold,protein,results/analysis/adversarial_deletion/summary.csv
+detection_aware_clustering.group_fold,1D;S1,detection_aware_clustering,O-GlcNAc self-clustering fold under peptide-exposure-conditioned null,1.1029431670402714,1.0696034998640114,1.1364428970318587,fold,protein,results/analysis/detection_aware_clustering/summary.json
+detection_aware_clustering.positive_fraction,1D;S1,detection_aware_clustering,fraction of proteins with positive excess under peptide-aware null,0.6678321678321678,0.6282274250493132,0.7051976819119157,fraction,protein,results/analysis/detection_aware_clustering/summary.json
+evidence_restricted_clustering.two_distinct_mapped_peptides.group_fold,1D;S1,evidence_restricted_clustering,O-GlcNAc self-clustering fold among sites supported by at least two distinct mapped peptides,11.405402089537894,9.63205917849144,13.420717824533995,fold,protein,results/analysis/evidence_restricted_clustering/summary.json
+evidence_restricted_clustering.two_distinct_mapped_peptides.positive_fraction,1D;S1,evidence_restricted_clustering,positive-excess fraction among sites supported by at least two distinct mapped peptides,0.9124087591240876,0.8531360861969796,0.9491844872064866,fraction,protein,results/analysis/evidence_restricted_clustering/summary.json
+evidence_restricted_clustering.two_independent_publications.group_fold,1D;S1,evidence_restricted_clustering,O-GlcNAc self-clustering fold among sites supported by at least two independent publications,12.756816483693555,11.517876095142194,14.115675488388595,fold,protein,results/analysis/evidence_restricted_clustering/summary.json
+evidence_restricted_clustering.two_independent_publications.positive_fraction,1D;S1,evidence_restricted_clustering,positive-excess fraction among sites supported by at least two independent publications,0.9384615384615385,0.9068654561883872,0.9598135842892938,fraction,protein,results/analysis/evidence_restricted_clustering/summary.json
+evolution.fly.gap,4B,evolution,regional minus exact conservation,0.4666064981949459,0.42999154160345726,0.5152729351870364,fraction,protein,results/analysis/evolution/summary.json
+evolution.mouse.gap,4B,evolution,regional minus exact conservation,0.1296241491565552,0.10475280721706828,0.15537336887039094,fraction,protein,results/analysis/evolution/summary.json
+evolution.null_excess.cosine,4E;S3,evolution,cosine conservation excess over within-protein null,0.4435714165714956,0.3874843403167186,0.5049078095502048,correlation-scale difference,protein,results/analysis/evolution/summary.json
+evolution.null_excess.js,4E;S3,evolution,js conservation excess over within-protein null,0.4166791303397937,0.3683143930261574,0.47202446324898384,correlation-scale difference,protein,results/analysis/evolution/summary.json
+evolution.null_excess.pearson,4E;S3,evolution,pearson conservation excess over within-protein null,0.6270359326641678,0.554039370601116,0.7037706952180026,correlation-scale difference,protein,results/analysis/evolution/summary.json
+evolution.null_excess.position,4E;S3,evolution,position conservation excess over within-protein null,0.23405367586061784,0.1815295748808998,0.2943485840394471,correlation-scale difference,protein,results/analysis/evolution/summary.json
+evolution.rat.gap,4B,evolution,regional minus exact conservation,0.14906642179369453,0.12406457748964689,0.17451948236357182,fraction,protein,results/analysis/evolution/summary.json
+evolution.worm.gap,4B,evolution,regional minus exact conservation,0.401840490797546,0.31950207468879666,0.48196839249911544,fraction,protein,results/analysis/evolution/summary.json
+evolution.zebrafish.gap,4B,evolution,regional minus exact conservation,0.4037174721189591,0.36473247927656366,0.43930831480658067,fraction,protein,results/analysis/evolution/summary.json
+fg_nup.adjusted_odds_ratio,5A;5B,fg_nup_recovery,adjusted_odds_ratio,13.768131456986458,,,odds ratio,protein,results/analysis/fg_nup_recovery/summary.json
+fg_nup.adjusted_p,5A;5B,fg_nup_recovery,adjusted_p,4.3500949205990294e-08,,,p-value,protein,results/analysis/fg_nup_recovery/summary.json
+fg_nup.background_region_fraction,5A;5B,fg_nup_recovery,background_region_fraction,0.13493635077793495,,,fraction,protein,results/analysis/fg_nup_recovery/summary.json
+fg_nup.hypergeometric_p,5A;5B,fg_nup_recovery,hypergeometric_p,3.6549594270101555e-06,,,p-value,protein,results/analysis/fg_nup_recovery/summary.json
+fg_nup.matched_p,5A;5B,fg_nup_recovery,matched_p,0.004144974062204909,,,p-value,protein,results/analysis/fg_nup_recovery/summary.json
+fg_nup.recovery_fraction,5A;5B,fg_nup_recovery,recovery_fraction,0.8,,,fraction,protein,results/analysis/fg_nup_recovery/summary.json
+kinome.cluster_n90,3C;S2A,kinome,cluster_n90,18.14879137162274,,,kinases above 90th percentile,protein,results/analysis/yin_yang/summary.json
+kinome.control_n90,3C;S2A,kinome,control_n90,23.440547544654926,,,kinases above 90th percentile,protein,results/analysis/yin_yang/summary.json
+kinome.delta_n90,3C;S2A,kinome,delta_n90,-5.291756173032191,-6.68995148721147,-3.9473611590414537,kinases above 90th percentile,protein,results/analysis/yin_yang/summary.json
+object.atlas_proteins,1A;S1,consensus_regions,atlas_proteins,3532.0,,,proteins,site catalogue,results/analysis/consensus_regions/summary.json
+object.region_bearing_proteins,1A;S1,consensus_regions,region_bearing_proteins,477.0,,,proteins,site catalogue,results/analysis/consensus_regions/summary.json
+object.region_sites,1A;S1,consensus_regions,region_sites,4196.0,,,sites,site catalogue,results/analysis/consensus_regions/summary.json
+object.regions,1A;S1,consensus_regions,regions,824.0,,,regions,site catalogue,results/analysis/consensus_regions/summary.json
+ogt.identity.asn_ladder,4A,ogt_conservation,human to mouse identity: asn_ladder,1.0,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
+ogt.identity.buried_core,4A,ogt_conservation,human to mouse identity: buried_core,0.9973544973544973,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
+ogt.identity.catalytic_triad,4A,ogt_conservation,human to mouse identity: catalytic_triad,1.0,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
+ogt.identity.other_surface,4A,ogt_conservation,human to mouse identity: other_surface,0.9922178988326849,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
+ogt.identity.peptide_contact_channel,4A,ogt_conservation,human to mouse identity: peptide_contact_channel,1.0,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
+ogt.identity.reading_surface,4A,ogt_conservation,human to mouse identity: reading_surface,1.0,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
+regional_code.composition.auroc,2A,regional_code,composition held-out AUROC,0.8219988722110085,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
+regional_code.composition_matched.auroc,2A,regional_code,composition_matched held-out AUROC,0.7453894398885004,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
+regional_code.full.auroc,2A,regional_code,full held-out AUROC,0.8788975288086618,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
+regional_code.geometry.auroc,2A,regional_code,geometry held-out AUROC,0.8424823603127468,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
+regional_code.geometry_matched.auroc,2A,regional_code,geometry_matched held-out AUROC,0.7203301978349169,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
+regional_code.within_protein.auroc,2C,regional_code,mean within-protein AUROC,0.8743789354729757,0.861297929794372,0.8867824173280383,AUROC,protein,results/analysis/regional_code/summary.json
+scanner.baseline.auroc,5C;5D,scanner,baseline auroc,0.916824448633845,,,auroc,outer protein-grouped fold,results/analysis/scanner/summary.json
+scanner.baseline.average_precision,5C;5D,scanner,baseline average_precision,0.19096755406455435,,,average_precision,outer protein-grouped fold,results/analysis/scanner/summary.json
+scanner.enhanced.auroc,5C;5D,scanner,enhanced auroc,0.9296916915485249,,,auroc,outer protein-grouped fold,results/analysis/scanner/summary.json
+scanner.enhanced.average_precision,5C;5D,scanner,enhanced average_precision,0.21863497621947386,,,average_precision,outer protein-grouped fold,results/analysis/scanner/summary.json
+scanner.selected.auroc,5C;5D,scanner,selected auroc,0.9296916915485249,,,auroc,outer protein-grouped fold,results/analysis/scanner/summary.json
+scanner.selected.average_precision,5C;5D,scanner,selected average_precision,0.21863497621947386,,,average_precision,outer protein-grouped fold,results/analysis/scanner/summary.json
+transfer.human_to_target.Arabidopsis,4C,evolution,alignment-free transfer AUROC,0.86438855856583,0.8206110711252325,0.9056410610012616,AUROC,protein-grouped tile,results/analysis/evolution/summary.json
+transfer.human_to_target.mouse,4C,evolution,alignment-free transfer AUROC,0.8617398415002272,0.8321298441420133,0.8935284218724225,AUROC,protein-grouped tile,results/analysis/evolution/summary.json
+transfer.human_to_target.rice,4C,evolution,alignment-free transfer AUROC,0.8065612089584693,0.7677481780591642,0.8426008963648411,AUROC,protein-grouped tile,results/analysis/evolution/summary.json
+transfer.rice_to_human.human,4C,evolution,alignment-free transfer AUROC,0.8113448310305266,0.7985542598101216,0.8234664753668065,AUROC,protein-grouped tile,results/analysis/evolution/summary.json
+yin_yang.local.all_w10_all_st,3D;S2C,yin_yang,same-site observed to expected ratio,0.9848067358058189,0.9469148204600327,1.024496714298876,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.all_w10_residue_matched,3D;S2C,yin_yang,same-site observed to expected ratio,0.9906241041810703,0.952689317821611,1.0309431190591578,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.all_w25_all_st,3D;S2C,yin_yang,same-site observed to expected ratio,0.9972746187409954,0.9574046419373659,1.0387480470475308,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.all_w25_residue_matched,3D;S2C,yin_yang,same-site observed to expected ratio,0.9963295408878146,0.9557155426178003,1.0389188963575129,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.all_w50_all_st,3D;S2C,yin_yang,same-site observed to expected ratio,1.039234380262326,0.9972174266564805,1.0835711557634813,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.all_w50_residue_matched,3D;S2C,yin_yang,same-site observed to expected ratio,1.0421803014499522,1.0009667107408053,1.0847655121035673,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.regional_w10_all_st,3D;S2C,yin_yang,same-site observed to expected ratio,0.9836438902714538,0.9015958939848754,1.0774703338608707,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.regional_w10_residue_matched,3D;S2C,yin_yang,same-site observed to expected ratio,1.0017843832584195,0.9158276049304283,1.0963389116270128,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.regional_w25_all_st,3D;S2C,yin_yang,same-site observed to expected ratio,0.9627455160787584,0.8781052798465593,1.0526426762507421,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.regional_w25_residue_matched,3D;S2C,yin_yang,same-site observed to expected ratio,0.9494565711332607,0.8656543573838343,1.039551154052978,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.regional_w50_all_st,3D;S2C,yin_yang,same-site observed to expected ratio,1.0028021690082012,0.9137478086212898,1.0994903395582523,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.local.regional_w50_residue_matched,3D;S2C,yin_yang,same-site observed to expected ratio,1.0154121154398923,0.9294553168980829,1.1068198182272426,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.nested.all.N0_length,3E,yin_yang,all same-site ratio under N0_length,7.079429161809717,6.606606978750751,7.591771397346882,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.nested.all.N1_st,3E,yin_yang,all same-site ratio under N1_st,1.1328566175347035,1.0878567732193989,1.1787274602688467,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.nested.all.N2_disorder,3E,yin_yang,all same-site ratio under N2_disorder,1.0492614573582633,1.0121949422225371,1.0876503317725623,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.nested.regional.N0_length,3E,yin_yang,regional same-site ratio under N0_length,6.110504955746983,5.527715302755386,6.7608465379602185,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.nested.regional.N1_st,3E,yin_yang,regional same-site ratio under N1_st,1.0848962135470726,1.0045481278439266,1.1697992666534067,ratio,protein,results/analysis/yin_yang/summary.json
+yin_yang.nested.regional.N2_disorder,3E,yin_yang,regional same-site ratio under N2_disorder,0.9966010967976011,0.9255138230080409,1.067771531020262,ratio,protein,results/analysis/yin_yang/summary.json

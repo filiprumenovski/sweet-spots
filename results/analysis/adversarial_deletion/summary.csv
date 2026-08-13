@@ -1,0 +1,2 @@
+n_proteins,n_positive_effect,full_group_fold,first_below_null_n,first_below_null_pct,fold_after_top_one,fold_after_top_10pct,fold_after_top_25pct,fold_after_top_50pct,fold_after_top_70pct
+1057,919,8.910516510136445,828,78.3349101229896,8.88529545945487,7.185083645712376,5.857386005639202,3.647493543113709,1.905300331543507

@@ -1,0 +1,22 @@
+# Python and test tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+dist/
+.coverage
+.DS_Store
+.idea/
+.vscode/
+.env
+.env.*
+
+# Frozen input bundle (distributed separately)
+inputs/
+
+# Workflow state and restartable intermediates
+.snakemake/
+results/work/
+results/logs/
+results/benchmarks/

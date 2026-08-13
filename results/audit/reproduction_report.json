@@ -1,0 +1,183 @@
+{
+  "computational_pass": true,
+  "figure_checks": [
+    {
+      "exists": true,
+      "figure": "Figure_1",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_1.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_1",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_1.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_2",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_2.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_2",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_2.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_3",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_3.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_3",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_3.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_4",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_4.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_4",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_4.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_5",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_5.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_5",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_5.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S1",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S1.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S1",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S1.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S2",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S2.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S2",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S2.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S3",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S3.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S3",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S3.png"
+    }
+  ],
+  "numerical_checks": [
+    {
+      "absolute_error": 0.0,
+      "claim_id": "object.regions",
+      "expected": 824,
+      "observed": 824.0,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "object.region_sites",
+      "expected": 4196,
+      "observed": 4196.0,
+      "passed": true
+    },
+    {
+      "absolute_error": 8.881784197001252e-16,
+      "claim_id": "clustering.r10",
+      "expected": 4.073557885388373,
+      "observed": 4.073557885388374,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "regional_code.full.auroc",
+      "expected": 0.8788975288086618,
+      "observed": 0.8788975288086618,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "regional_code.within_protein.auroc",
+      "expected": 0.8743789354729757,
+      "observed": 0.8743789354729757,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "kinome.delta_n90",
+      "expected": -5.291756173032191,
+      "observed": -5.291756173032191,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "evolution.worm.gap",
+      "expected": 0.401840490797546,
+      "observed": 0.401840490797546,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "transfer.human_to_target.rice",
+      "expected": 0.8065612089584693,
+      "observed": 0.8065612089584693,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "fg_nup.recovery_fraction",
+      "expected": 0.8,
+      "observed": 0.8,
+      "passed": true
+    }
+  ],
+  "status": "reproduced"
+}

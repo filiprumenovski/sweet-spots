@@ -1,0 +1,48 @@
+{
+  "asn_ladder": [
+    331,
+    332,
+    335,
+    366,
+    400,
+    403,
+    434,
+    468
+  ],
+  "dimer_interface": 11,
+  "dimer_reading_surface_overlap": 0,
+  "human_mouse_categories": [
+    {
+      "category": "asn_ladder",
+      "identity": 1.0,
+      "n": 8
+    },
+    {
+      "category": "buried_core",
+      "identity": 0.9973544973544973,
+      "n": 378
+    },
+    {
+      "category": "catalytic_triad",
+      "identity": 1.0,
+      "n": 3
+    },
+    {
+      "category": "other_surface",
+      "identity": 0.9922178988326849,
+      "n": 257
+    },
+    {
+      "category": "peptide_contact_channel",
+      "identity": 1.0,
+      "n": 65
+    },
+    {
+      "category": "reading_surface",
+      "identity": 1.0,
+      "n": 66
+    }
+  ],
+  "peptide_contacts": 65,
+  "reading_surface": 66
+}

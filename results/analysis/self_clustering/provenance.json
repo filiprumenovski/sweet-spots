@@ -1,0 +1,78 @@
+{
+  "audits": {
+    "acetylation": {
+      "input_unique_sites": 41615,
+      "missing_canonical": 0,
+      "out_of_range": 0,
+      "residue_mismatch": 0,
+      "strict_proteins": 8298,
+      "strict_sites": 39490,
+      "wrong_residue": 2125
+    },
+    "oglcnac_atlas": {
+      "input_unique_sites": 13475,
+      "missing_canonical": 470,
+      "out_of_range": 16,
+      "residue_mismatch": 498,
+      "strict_proteins": 3532,
+      "strict_sites": 12491,
+      "wrong_residue": 0
+    },
+    "phospho": {
+      "input_unique_sites": 219019,
+      "missing_canonical": 0,
+      "out_of_range": 0,
+      "residue_mismatch": 0,
+      "strict_proteins": 16297,
+      "strict_sites": 182760,
+      "wrong_residue": 36259
+    },
+    "ubiquitination": {
+      "input_unique_sites": 62673,
+      "missing_canonical": 0,
+      "out_of_range": 0,
+      "residue_mismatch": 0,
+      "strict_proteins": 9166,
+      "strict_sites": 62657,
+      "wrong_residue": 16
+    }
+  },
+  "config": {
+    "base_seed": 20260814,
+    "execution": "one deterministic map job per PTM; validated reduce",
+    "minimum_sites_per_protein": 3,
+    "permutations": 20000,
+    "primary_radius": 10,
+    "ptms": [
+      "oglcnac",
+      "phospho",
+      "acetylation",
+      "ubiquitination"
+    ],
+    "radii": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "weighting": "equal_protein"
+  },
+  "environment": {
+    "numpy": "2.4.3",
+    "pandas": "3.0.1",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "python": "3.12.13",
+    "scipy": "1.17.1"
+  },
+  "generated_utc": "2026-08-13T12:57:04.429258+00:00",
+  "inputs": {
+    "analysis/revalidation/data/atlas_unambiguous.csv": "7ea5e1351f71605fae0e7556184845dbb10d4b1acb6bb3f44db9024b8fb3f95e",
+    "data/interim/fasta_human.parquet": "6bc93cfe0ff4ca0365863d3b6c50d429202fcb37d9dcf5a00db4f5dc5d58cd58",
+    "data/processed/landscape/ptm_unified.parquet": "2a5fc9b2cdc3ac2b61423a83c734346fe7d016b1d6d93c21fcb59162abedff57"
+  },
+  "n_canonical_sequences": 20329,
+  "script": "src/regional_code_paper/execution/self_clustering.py",
+  "script_sha256": "06353d01d9e26c041f9511460545559a0533dc61126aa1b3ff2dbf945ca8ee5a"
+}

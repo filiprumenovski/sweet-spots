@@ -1,0 +1,51 @@
+# Paths are resolved relative to the repository root.
+# `source_root` is the frozen analysis-ready data bundle. Unpack it at
+# `inputs/` or replace this value with its location on the reviewer machine.
+source_root: inputs
+# The publication archive has one canonical output namespace. Keeping it fixed
+# prevents analyses and figures from reading different result trees.
+results_root: results
+
+randomness:
+  manuscript_base_seed: 42
+  archived_clustering_seed: 20260814
+  bootstrap_draws: 20000
+  figure_bootstrap_draws: 10000
+  detection_null_draws: 2000
+
+analysis:
+  consensus_gaps: [5, 8, 10, 12, 15]
+  final_gap: 10
+  minimum_region_sites: 3
+  clustering_radii: [5, 10, 15, 20, 25, 30]
+  primary_radius: 10
+  tile_step: 10
+  tile_half_width: 25
+
+# Map counts are explicit scientific-computing parameters. Changing them alters
+# scheduling only: global record indices and random seeds remain invariant.
+parallel:
+  kinase_scoring_shards: 16
+  detection_null_shards: 16
+
+resources:
+  default:
+    mem_mb: 4000
+    runtime: 30
+    disk_mb: 4000
+  feature_extraction:
+    mem_mb: 16000
+    runtime: 180
+    disk_mb: 20000
+  model_fold:
+    mem_mb: 16000
+    runtime: 240
+    disk_mb: 10000
+  simulation_shard:
+    mem_mb: 6000
+    runtime: 180
+    disk_mb: 4000
+  kinase_shard:
+    mem_mb: 6000
+    runtime: 240
+    disk_mb: 4000

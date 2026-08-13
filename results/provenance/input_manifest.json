@@ -1,0 +1,89 @@
+{
+  "contract": "analysis-ready inputs; no network access is permitted by the DAG",
+  "directories": {
+    "human_ortholog_alignments": {
+      "bytes": 42956207,
+      "files": 16450,
+      "path": "data/interim/msa",
+      "pattern": "*.afa",
+      "tree_sha256": "027601f6451bc5bb88b7eef957fb953c24a649251e85d8e85eed6ac35fb57405"
+    },
+    "ogt_structures": {
+      "bytes": 79766661,
+      "files": 44,
+      "path": "analysis/revalidation/data/ogt_structures",
+      "pattern": "*.cif",
+      "tree_sha256": "49630bd4b476f9589932a15d48d18d31a7d644a0d2108410ea77a537c91a454f"
+    }
+  },
+  "files": {
+    "arabidopsis_sequences": {
+      "bytes": 357505,
+      "path": "data/external/multispecies_oglcnac/arabidopsis_sequences.fasta",
+      "sha256": "e6be02199989ef74cb19dedfa5207d074d63c86f931e356358df5d5c8341c242"
+    },
+    "canonical_human_sequences": {
+      "bytes": 6442658,
+      "path": "data/interim/fasta_human.parquet",
+      "sha256": "6bc93cfe0ff4ca0365863d3b6c50d429202fcb37d9dcf5a00db4f5dc5d58cd58"
+    },
+    "canonical_multispecies_sequences": {
+      "bytes": 73564497,
+      "path": "data/interim/fasta_all.parquet",
+      "sha256": "a095493056bddb7a9016a82aa94758fb83c844dddfcf0c40fe682865f178cf40"
+    },
+    "celegans_sequences": {
+      "bytes": 45880,
+      "path": "data/external/multispecies_oglcnac/celegans_sequences.fasta",
+      "sha256": "29b7fc942b4c3d8487a5a1f5209e445b121bf1661da28eeea2d6ec92fccc2dfd"
+    },
+    "drosophila_sequences": {
+      "bytes": 44030,
+      "path": "data/external/multispecies_oglcnac/drosophila_sequences.fasta",
+      "sha256": "1d046f7fc9735d50ab1e05a6fd9a9da4302ddb1df94447b1f2add47ee1e696ed"
+    },
+    "oglcnac_atlas_strict": {
+      "bytes": 7444780,
+      "path": "analysis/revalidation/data/atlas_unambiguous.csv",
+      "sha256": "7ea5e1351f71605fae0e7556184845dbb10d4b1acb6bb3f44db9024b8fb3f95e"
+    },
+    "ogt_human_sequence": {
+      "bytes": 1208,
+      "path": "analysis/revalidation/data/ogt_orthologs/O15294.fasta",
+      "sha256": "8720f3210c0a4fa83321b94d1c0c253a6669fd9996e24924ea2b91e504d5a847"
+    },
+    "ogt_ortholog_alignment": {
+      "bytes": 9642,
+      "path": "analysis/revalidation/data/ogt_orthologs/orthologs_aln.fasta",
+      "sha256": "65a97959ef4f2db7a81c00e108a50ef464c98c8a304545a0a125b89b9cfe7f25"
+    },
+    "reference_consensus_regions": {
+      "bytes": 43244,
+      "path": "data/processed/regions/oglcnac_consensus_regions.parquet",
+      "sha256": "fe455248ac4b41db6a508e467d3081c131755e0e0ad358fb4dc630b3adf21438"
+    },
+    "residue_disorder": {
+      "bytes": 18320546,
+      "path": "data/interim/iupred_residue_scores.parquet",
+      "sha256": "b0a2c1b04eaca6b95601e748f7dfef3be54d608aeeb49e975314e98e9176414d"
+    },
+    "rice_sequences": {
+      "bytes": 492827,
+      "path": "data/external/multispecies_oglcnac/rice_sequences.fasta",
+      "sha256": "4891f26934f25d69d7e9fa3f85a80197b235068cc27d809bdbecc13d053dfd8d"
+    },
+    "unified_ptm_catalogue": {
+      "bytes": 6316870,
+      "path": "data/processed/landscape/ptm_unified.parquet",
+      "sha256": "2a5fc9b2cdc3ac2b61423a83c734346fe7d016b1d6d93c21fcb59162abedff57"
+    }
+  },
+  "runtime": {
+    "numpy": "2.4.3",
+    "pandas": "3.0.1",
+    "polars": "1.39.0",
+    "python": "3.12.13",
+    "scikit_learn": "1.8.0",
+    "scipy": "1.17.1"
+  }
+}

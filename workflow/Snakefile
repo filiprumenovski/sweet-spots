@@ -1,0 +1,65 @@
+"""Paper-only workflow for the O-GlcNAc regional-code manuscript.
+
+Run from the repository root with:
+
+    uv run snakemake --snakefile workflow/Snakefile --profile profiles/local
+
+The DAG deliberately excludes every retired, exploratory, disease, LLPS,
+stoichiometry, network, and legacy cassette analysis in the parent project.
+"""
+
+configfile: "config/config.yaml"
+
+from snakemake.utils import validate
+
+validate(config, "../config/schema.yaml")
+
+SOURCE_ROOT = config["source_root"]
+RESULTS = config.get("results_root", "results")
+PTMS = ["oglcnac", "phospho", "acetylation", "ubiquitination"]
+OUTER_FOLDS = [str(value) for value in range(5)]
+KINASE_SHARDS = [
+    str(value) for value in range(config["parallel"]["kinase_scoring_shards"])
+]
+DETECTION_SHARDS = [
+    str(value) for value in range(config["parallel"]["detection_null_shards"])
+]
+EXTERNAL_SEQUENCE_FASTAS = [
+    f"{SOURCE_ROOT}/data/external/multispecies_oglcnac/{species}_sequences.fasta"
+    for species in ("rice", "arabidopsis", "drosophila", "celegans")
+]
+
+FIGURES = [
+    "Figure_1",
+    "Figure_2",
+    "Figure_3",
+    "Figure_4",
+    "Figure_5",
+    "Figure_S1",
+    "Figure_S2",
+    "Figure_S3",
+]
+
+
+include: "rules/foundation/input_manifest.smk"
+include: "rules/foundation/consensus_regions.smk"
+include: "rules/analyses/self_clustering.smk"
+include: "rules/analyses/detection_aware_clustering.smk"
+include: "rules/analyses/evidence_restricted_clustering.smk"
+include: "rules/analyses/regional_code.smk"
+include: "rules/analyses/yin_yang.smk"
+include: "rules/analyses/evolution.smk"
+include: "rules/analyses/scanner.smk"
+include: "rules/analyses/ogt_conservation.smk"
+include: "rules/analyses/fg_nup_recovery.smk"
+include: "rules/products/result_ledger.smk"
+include: "rules/products/figures.smk"
+include: "rules/products/audit.smk"
+
+
+rule all:
+    input:
+        f"{RESULTS}/audit/reproduction_report.json",
+        f"{RESULTS}/tables/manuscript_result_ledger.parquet",
+        expand(f"{RESULTS}/figures/{{figure}}.pdf", figure=FIGURES),
+        expand(f"{RESULTS}/figures/{{figure}}.png", figure=FIGURES),

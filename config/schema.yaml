@@ -1,0 +1,69 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: object
+required:
+  - source_root
+  - results_root
+  - randomness
+  - analysis
+  - parallel
+  - resources
+properties:
+  source_root: {type: string, minLength: 1}
+  results_root: {const: results}
+  randomness:
+    type: object
+    required: [manuscript_base_seed, archived_clustering_seed, bootstrap_draws, figure_bootstrap_draws, detection_null_draws]
+    properties:
+      manuscript_base_seed: {type: integer, minimum: 0}
+      archived_clustering_seed: {const: 20260814}
+      bootstrap_draws: {type: integer, minimum: 100}
+      figure_bootstrap_draws: {type: integer, minimum: 100}
+      detection_null_draws: {type: integer, minimum: 100}
+    additionalProperties: false
+  analysis:
+    type: object
+    required: [consensus_gaps, final_gap, minimum_region_sites, clustering_radii, primary_radius, tile_step, tile_half_width]
+    properties:
+      consensus_gaps:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: integer, minimum: 1}
+      final_gap: {type: integer, minimum: 1}
+      minimum_region_sites: {type: integer, minimum: 2}
+      clustering_radii:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: integer, minimum: 1}
+      primary_radius: {type: integer, minimum: 1}
+      tile_step: {type: integer, minimum: 1}
+      tile_half_width: {type: integer, minimum: 1}
+    additionalProperties: false
+  parallel:
+    type: object
+    required: [kinase_scoring_shards, detection_null_shards]
+    properties:
+      kinase_scoring_shards: {type: integer, minimum: 1, maximum: 256}
+      detection_null_shards: {type: integer, minimum: 1, maximum: 256}
+    additionalProperties: false
+  resources:
+    type: object
+    required: [default, feature_extraction, model_fold, simulation_shard, kinase_shard]
+    properties:
+      default: {$ref: "#/$defs/resource"}
+      feature_extraction: {$ref: "#/$defs/resource"}
+      model_fold: {$ref: "#/$defs/resource"}
+      simulation_shard: {$ref: "#/$defs/resource"}
+      kinase_shard: {$ref: "#/$defs/resource"}
+    additionalProperties: false
+$defs:
+  resource:
+    type: object
+    required: [mem_mb, runtime, disk_mb]
+    properties:
+      mem_mb: {type: integer, minimum: 256}
+      runtime: {type: integer, minimum: 1}
+      disk_mb: {type: integer, minimum: 256}
+    additionalProperties: false
+additionalProperties: false

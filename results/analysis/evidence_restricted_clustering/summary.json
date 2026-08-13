@@ -1,0 +1,58 @@
+{
+  "all_strict_sites": {
+    "group_fold": 8.91051651013636,
+    "group_fold_ci_high": 9.471610414069882,
+    "group_fold_ci_low": 8.373350310461165,
+    "mean_effect": 0.2745000014634576,
+    "mean_null_close_pair_fraction": 0.03470064200128012,
+    "mean_observed_close_pair_fraction": 0.3092006434647377,
+    "n_positive_excess": 919,
+    "n_proteins": 1057,
+    "n_sites": 9283,
+    "positive_excess_fraction": 0.8694418164616841,
+    "positive_excess_fraction_ci_high": 0.888422371319109,
+    "positive_excess_fraction_ci_low": 0.8477856581711926,
+    "radius": 10,
+    "resampling_unit": "protein"
+  },
+  "audit": {
+    "invalid_rows": 1400,
+    "multi_peptide_sites": 1520,
+    "multi_publication_sites": 3585,
+    "valid_unique_sites": 12491
+  },
+  "interpretation": "Post hoc independent-evidence restrictions; fewer sites and proteins change the estimand and preclude direct fold comparisons as endpoints.",
+  "primary_radius": 10,
+  "two_distinct_mapped_peptides": {
+    "group_fold": 11.405402089537894,
+    "group_fold_ci_high": 13.420717824533995,
+    "group_fold_ci_low": 9.63205917849144,
+    "mean_effect": 0.3229577435776129,
+    "mean_null_close_pair_fraction": 0.031037507325385405,
+    "mean_observed_close_pair_fraction": 0.3539952509029984,
+    "n_positive_excess": 125,
+    "n_proteins": 137,
+    "n_sites": 1111,
+    "positive_excess_fraction": 0.9124087591240876,
+    "positive_excess_fraction_ci_high": 0.9491844872064866,
+    "positive_excess_fraction_ci_low": 0.8531360861969796,
+    "radius": 10,
+    "resampling_unit": "protein"
+  },
+  "two_independent_publications": {
+    "group_fold": 12.756816483693555,
+    "group_fold_ci_high": 14.115675488388595,
+    "group_fold_ci_low": 11.517876095142194,
+    "mean_effect": 0.3651642021695275,
+    "mean_null_close_pair_fraction": 0.031059785842196496,
+    "mean_observed_close_pair_fraction": 0.396223988011724,
+    "n_positive_excess": 305,
+    "n_proteins": 325,
+    "n_sites": 2991,
+    "positive_excess_fraction": 0.9384615384615385,
+    "positive_excess_fraction_ci_high": 0.9598135842892938,
+    "positive_excess_fraction_ci_low": 0.9068654561883872,
+    "radius": 10,
+    "resampling_unit": "protein"
+  }
+}

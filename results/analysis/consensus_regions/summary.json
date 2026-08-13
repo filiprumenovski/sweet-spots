@@ -1,0 +1,36 @@
+{
+  "audit": {
+    "input_rows": 30524,
+    "missing_sequence": 617,
+    "out_of_range": 17,
+    "residue_mismatch": 766,
+    "validated_proteins": 3532,
+    "validated_sites": 12491
+  },
+  "definition": {
+    "coordinate_system": "one-based inclusive",
+    "final_gap": 10,
+    "gaps": [
+      5,
+      8,
+      10,
+      12,
+      15
+    ],
+    "minimum_sites": 3
+  },
+  "inputs": {
+    "atlas_sha256": "7ea5e1351f71605fae0e7556184845dbb10d4b1acb6bb3f44db9024b8fb3f95e",
+    "fasta_sha256": "6bc93cfe0ff4ca0365863d3b6c50d429202fcb37d9dcf5a00db4f5dc5d58cd58"
+  },
+  "reference_region_object_sha256": "fe455248ac4b41db6a508e467d3081c131755e0e0ad358fb4dc630b3adf21438",
+  "results": {
+    "atlas_proteins": 3532,
+    "region_bearing_proteins": 477,
+    "region_sites": 4196,
+    "regions": 824,
+    "regions_surviving_each_publication_removal": 400,
+    "regions_with_three_pmids": 584,
+    "regions_with_two_pmids": 653
+  }
+}

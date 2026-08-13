@@ -1,0 +1,36 @@
+{
+  "acceptor_model": {
+    "n_proteins": 3134,
+    "n_sites": 11902
+  },
+  "distance": {
+    "n_pairs": 18109,
+    "n_proteins": 471
+  },
+  "tiles": {
+    "global_auroc": {
+      "composition": 0.8219988722110085,
+      "covariates": 0.8358814332399447,
+      "disorder": 0.6418553924202619,
+      "full": 0.8788975288086618,
+      "geometry": 0.8424823603127468,
+      "st_only": 0.8299537303444738
+    },
+    "matched": {
+      "composition_auroc": 0.7453894398885004,
+      "geometry_auroc": 0.7203301978349169,
+      "n_tiles": 16253
+    },
+    "n_positive": 3102,
+    "n_proteins": 465,
+    "n_tiles": 49394
+  },
+  "within_protein": {
+    "ci": [
+      0.861297929794372,
+      0.8867824173280383
+    ],
+    "mean_auroc": 0.8743789354729757,
+    "n_proteins": 454
+  }
+}

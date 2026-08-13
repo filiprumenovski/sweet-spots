@@ -1,0 +1,13 @@
+executor: local
+cores: 4
+resources:
+  - mem_mb=32000
+latency-wait: 30
+rerun-incomplete: true
+printshellcmds: true
+show-failed-logs: true
+keep-going: false
+default-resources:
+  - mem_mb=4000
+  - runtime=30
+  - disk_mb=4000

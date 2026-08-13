@@ -1,0 +1,13 @@
+executor: slurm
+jobs: 128
+latency-wait: 120
+rerun-incomplete: true
+printshellcmds: true
+show-failed-logs: true
+keep-going: false
+slurm-logdir: results/logs/slurm
+default-resources:
+  - mem_mb=4000
+  - runtime=30
+  - disk_mb=4000
+  - cpus_per_task=1
