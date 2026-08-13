@@ -1,6 +1,7 @@
 # Sweet spots
 
 [![Release: v1.0.2](https://img.shields.io/badge/release-v1.0.2-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.2)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21922595.svg)](https://doi.org/10.5281/zenodo.21922595)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
@@ -139,7 +140,10 @@ for the canonical project authorship record.
 ## Citation and license
 
 Use the repository's `CITATION.cff` metadata or GitHub's **Cite this repository**
-menu to cite this software release.
+menu to cite this software release. The archived v1.0.2 release is available at
+[doi:10.5281/zenodo.21922596](https://doi.org/10.5281/zenodo.21922596); use the
+[concept DOI](https://doi.org/10.5281/zenodo.21922595) to cite the software
+independently of version.
 
 The analysis code is available under the [MIT License](LICENSE). Input data
 retain the licenses and access conditions of their original providers; see the
