@@ -251,6 +251,12 @@ def bootstrap_interval(
 
 
 def per_protein_auc(tiles: pd.DataFrame) -> pd.DataFrame:
+    """Summarise held-out localisation within informative proteins.
+
+    The historical ``within_protein_auroc`` column is retained for the full
+    model so archived downstream consumers continue to work.  The explicitly
+    named composition column is the manuscript's address-level estimand.
+    """
     rows = []
     for accession, group in tiles.groupby("accession", sort=True):
         if group.label.nunique() == 2:
@@ -258,6 +264,9 @@ def per_protein_auc(tiles: pd.DataFrame) -> pd.DataFrame:
                 {
                     "accession": accession,
                     "within_protein_auroc": roc_auc_score(group.label, group.full_score),
+                    "composition_within_protein_auroc": roc_auc_score(
+                        group.label, group.composition_score
+                    ),
                 }
             )
     return pd.DataFrame(rows)

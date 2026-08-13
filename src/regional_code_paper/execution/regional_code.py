@@ -141,6 +141,12 @@ def reduce(
         draws=figure_draws,
         seed=stable_seed(base_seed, "within_protein_auroc"),
     )
+    composition_within_values = proteins.composition_within_protein_auroc.to_numpy(float)
+    composition_within_ci = bootstrap_interval(
+        composition_within_values,
+        draws=figure_draws,
+        seed=stable_seed(base_seed, "composition_within_protein_auroc"),
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
     write_csv(output_dir / "held_out_tiles.csv", tiles.drop(columns=["row_id"]))
     write_csv(output_dir / "per_protein.csv", proteins)
@@ -176,6 +182,11 @@ def reduce(
             "within_protein": {
                 "mean_auroc": float(within_values.mean()),
                 "ci": within_ci,
+                "n_proteins": len(proteins),
+            },
+            "composition_within_protein": {
+                "mean_auroc": float(composition_within_values.mean()),
+                "ci": composition_within_ci,
                 "n_proteins": len(proteins),
             },
             "acceptor_model": prepared["acceptor_model"],

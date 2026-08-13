@@ -1,11 +1,15 @@
-"""Construct the strict consensus O-GlcNAc region object used throughout the paper.
+"""Construct the operational O-GlcNAc region object used throughout the paper.
 
-The implementation mirrors the manuscript definition literally:
+The definition has two stages:
 
 1. Validate human serine/threonine sites against canonical sequences.
-2. Segment sites independently at each configured inter-site gap.
-3. Retain positions belonging to a segment at every gap.
-4. Re-segment the retained positions at the final gap.
+2. Identify strict core sites from components of at least three sites at gap 5.
+3. Re-segment those core sites at gap 10 to obtain the reported regions.
+
+For provenance, step 2 is implemented as the intersection of qualifying
+components at gaps 5, 8, 10, 12, and 15. These scalar thresholds are nested, so
+their intersection is mathematically equivalent to the strictest, gap-5 pass.
+The gap-10 pass changes final grouping, not core membership.
 
 All coordinates are one-based and inclusive. CSV is used at the Python boundary;
 the workflow performs any Parquet materialisation with DuckDB.
@@ -59,7 +63,13 @@ def segment_positions(
 def consensus_components(
     positions: Iterable[int], *, gaps: tuple[int, ...], final_gap: int, minimum_sites: int
 ) -> list[tuple[int, ...]]:
-    """Retain sites supported at every gap, then apply the final segmentation."""
+    """Intersect nested core calls, then group the surviving sites at the final gap.
+
+    With a common ``minimum_sites`` threshold, membership is monotone in the
+    maximum gap. The intersection over ``gaps`` therefore equals the call at
+    ``min(gaps)``. The explicit loop is retained because it mirrors the archived
+    definition and records the complete configured construction.
+    """
     votes: dict[int, int] = defaultdict(int)
     ordered = sorted(set(positions))
     for gap in gaps:

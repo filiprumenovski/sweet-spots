@@ -104,7 +104,11 @@ def figure_1(root: Path) -> Figure:
         region_summary["results"]["region_sites"],
         region_summary["results"]["regions"],
     ]
-    labels = ["validated\nS/T sites", "sites in\nregions", "consensus\nregions"]
+    labels = [
+        "validated\nO-GlcNAc sites",
+        "strict core\nsites (gap 5)",
+        "reported\nregions (gap 10)",
+    ]
     ax.bar(range(3), values, color=[GREY, BLUE, TEAL], width=0.62)
     for index, value in enumerate(values):
         ax.text(index, value * 1.03, f"{value:,}", ha="center", fontsize=5.5)
@@ -275,24 +279,38 @@ def figure_2(root: Path) -> Figure:
     axes[1].set_yticks(y, coefficients.outcome)
     axes[1].set_xlabel("cluster coefficient")
 
-    axes[2].hist(per_protein.within_protein_auroc, bins=24, color=BLUE_LIGHT, edgecolor=BLUE)
-    axes[2].axvline(summary["within_protein"]["mean_auroc"], color=BLUE)
-    axes[2].set(xlabel="within-protein AUROC", ylabel="proteins")
+    axes[2].hist(
+        per_protein.composition_within_protein_auroc,
+        bins=24,
+        color=BLUE_LIGHT,
+        edgecolor=BLUE,
+    )
+    axes[2].axvline(summary["composition_within_protein"]["mean_auroc"], color=BLUE)
+    axes[2].set(xlabel="composition-only within-protein AUROC", ylabel="proteins")
 
     informative = (
         tiles.groupby("accession")
         .filter(lambda group: group.label.nunique() == 2)
         .groupby("accession")
-        .agg(n=("label", "size"), positives=("label", "sum"), spread=("full_score", "std"))
+        .agg(
+            n=("label", "size"),
+            positives=("label", "sum"),
+            spread=("composition_score", "std"),
+        )
     )
     selected = informative.sort_values(["positives", "spread"], ascending=False).head(6).index
     for row, accession in enumerate(selected):
         group = tiles.loc[tiles.accession.eq(accession)].sort_values("center")
         offset = row * 1.1
-        axes[3].plot(group.center, group.full_score + offset, color=BLUE, linewidth=0.7)
+        axes[3].plot(
+            group.center,
+            group.composition_score + offset,
+            color=BLUE,
+            linewidth=0.7,
+        )
         axes[3].scatter(
             group.loc[group.label.eq(1), "center"],
-            group.loc[group.label.eq(1), "full_score"] + offset,
+            group.loc[group.label.eq(1), "composition_score"] + offset,
             s=4,
             color=RED,
         )
@@ -659,6 +677,118 @@ def figure_s3(root: Path) -> Figure:
     return fig
 
 
+def figure_s4(root: Path) -> Figure:
+    """Region-definition sensitivity across the complete post hoc grid."""
+    catalogue = pd.read_csv(
+        root / "analysis/region_definition_sensitivity/catalogue_grid.csv"
+    )
+    models = pd.read_csv(root / "analysis/region_definition_sensitivity/model_grid.csv")
+    final_ten = catalogue.loc[catalogue.final_gap.eq(10)]
+    fig, axes = plt.subplots(2, 2, figsize=(WIDTH, 90 * MM), constrained_layout=True)
+    for ax, label in zip(axes.ravel(), "abcd", strict=True):
+        ax.text(0, 1.04, label, transform=ax.transAxes, fontweight="bold", fontsize=8)
+
+    colors = {3: BLUE, 4: TEAL, 5: GOLD}
+    for minimum_sites, group in final_ten.groupby("minimum_sites"):
+        ordered = group.sort_values("core_gap")
+        axes[0, 0].plot(
+            ordered.core_gap,
+            ordered.core_sites,
+            "o-",
+            color=colors[int(minimum_sites)],
+            label=f"minimum {int(minimum_sites)} sites",
+        )
+    axes[0, 0].set(xlabel="strict-core gap", ylabel="retained core sites")
+    axes[0, 0].set_xticks(sorted(final_ten.core_gap.unique()))
+    axes[0, 0].legend(frameon=False)
+
+    jaccard = final_ten.pivot(
+        index="minimum_sites", columns="core_gap", values="site_jaccard"
+    ).sort_index(ascending=False)
+    image = axes[0, 1].imshow(jaccard, vmin=0, vmax=1, cmap="Blues", aspect="auto")
+    axes[0, 1].set_xticks(range(len(jaccard.columns)), jaccard.columns)
+    axes[0, 1].set_yticks(range(len(jaccard.index)), jaccard.index)
+    axes[0, 1].set(xlabel="strict-core gap", ylabel="minimum sites")
+    for row in range(jaccard.shape[0]):
+        for column in range(jaccard.shape[1]):
+            value = jaccard.iloc[row, column]
+            axes[0, 1].text(
+                column,
+                row,
+                f"{value:.2f}",
+                ha="center",
+                va="center",
+                color="white" if value > 0.65 else INK,
+                fontsize=5,
+            )
+    fig.colorbar(image, ax=axes[0, 1], label="site Jaccard vs primary")
+
+    for minimum_sites, group in models.groupby("minimum_sites"):
+        ordered = group.sort_values("core_gap")
+        axes[1, 0].plot(
+            ordered.core_gap,
+            ordered.composition_within_protein_auroc,
+            "o-",
+            color=colors[int(minimum_sites)],
+            label=f"minimum {int(minimum_sites)} sites",
+        )
+    axes[1, 0].axhline(0.5, color=GREY, linestyle=(0, (3, 2)), linewidth=0.6)
+    axes[1, 0].set(
+        xlabel="strict-core gap",
+        ylabel="composition-only within-protein AUROC",
+        ylim=(0.5, 0.9),
+    )
+    axes[1, 0].set_xticks(sorted(models.core_gap.unique()))
+    primary = models.loc[models.is_primary].iloc[0]
+    axes[1, 0].scatter(
+        [primary.core_gap],
+        [primary.composition_within_protein_auroc],
+        s=45,
+        facecolors="none",
+        edgecolors=RED,
+        linewidths=0.9,
+        zorder=4,
+    )
+    axes[1, 0].legend(frameon=False)
+
+    for minimum_sites, group in models.groupby("minimum_sites"):
+        ordered = group.sort_values("core_gap")
+        axes[1, 1].errorbar(
+            ordered.core_gap,
+            ordered.adjusted_composition_increment,
+            yerr=[
+                ordered.adjusted_composition_increment
+                - ordered.adjusted_composition_increment_ci_low,
+                ordered.adjusted_composition_increment_ci_high
+                - ordered.adjusted_composition_increment,
+            ],
+            fmt="o-",
+            capsize=2,
+            color=colors[int(minimum_sites)],
+            label=f"minimum {int(minimum_sites)} sites",
+        )
+    axes[1, 1].axhline(0, color=GREY, linestyle=(0, (3, 2)), linewidth=0.6)
+    axes[1, 1].set(
+        xlabel="strict-core gap",
+        ylabel="composition increment in within-protein AUROC",
+    )
+    axes[1, 1].set_xticks(sorted(models.core_gap.unique()))
+    axes[1, 1].scatter(
+        [primary.core_gap],
+        [primary.adjusted_composition_increment],
+        s=45,
+        facecolors="none",
+        edgecolors=RED,
+        linewidths=0.9,
+        zorder=4,
+    )
+    axes[1, 1].legend(frameon=False)
+
+    for ax in axes.ravel():
+        clean(ax)
+    return fig
+
+
 BUILDERS: dict[str, Callable[[Path], Figure]] = {
     "Figure_1": figure_1,
     "Figure_2": figure_2,
@@ -668,6 +798,7 @@ BUILDERS: dict[str, Callable[[Path], Figure]] = {
     "Figure_S1": figure_s1,
     "Figure_S2": figure_s2,
     "Figure_S3": figure_s3,
+    "Figure_S4": figure_s4,
 }
 
 

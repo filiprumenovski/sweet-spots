@@ -19,3 +19,15 @@ def test_consensus_requires_support_at_every_gap() -> None:
         final_gap=5,
         minimum_sites=3,
     ) == [(20, 22, 24)]
+
+
+def test_nested_gap_intersection_equals_strictest_core_call() -> None:
+    positions = [1, 4, 9, 17, 21, 25, 40, 47, 54]
+    strict_core = segment_positions(positions, maximum_gap=5, minimum_sites=3)
+    consensus = consensus_components(
+        positions,
+        gaps=(5, 8, 10, 12, 15),
+        final_gap=5,
+        minimum_sites=3,
+    )
+    assert consensus == strict_core

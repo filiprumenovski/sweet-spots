@@ -18,6 +18,7 @@ EXPECTED = {
     "clustering.r10": 4.073557885388373,
     "regional_code.full.auroc": 0.8788975288086618,
     "regional_code.within_protein.auroc": 0.8743789354729757,
+    "regional_code.composition_within_protein.auroc": 0.792152662273436,
     "kinome.delta_n90": -5.291756173032191,
     "evolution.worm.gap": 0.401840490797546,
     "transfer.human_to_target.rice": 0.8065612089584693,

@@ -1785,7 +1785,7 @@ wheels = [
 
 [[package]]
 name = "sweet-spots-reproducibility"
-version = "1.0.2"
+version = "1.0.3"
 source = { editable = "." }
 dependencies = [
     { name = "biopython" },

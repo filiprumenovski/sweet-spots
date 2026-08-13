@@ -3,6 +3,14 @@
     "n_proteins": 3134,
     "n_sites": 11902
   },
+  "composition_within_protein": {
+    "ci": [
+      0.7737033528096532,
+      0.8097706704735037
+    ],
+    "mean_auroc": 0.792152662273436,
+    "n_proteins": 454
+  },
   "distance": {
     "n_pairs": 18109,
     "n_proteins": 471

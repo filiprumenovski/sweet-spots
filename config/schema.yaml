@@ -22,7 +22,7 @@ properties:
     additionalProperties: false
   analysis:
     type: object
-    required: [consensus_gaps, final_gap, minimum_region_sites, clustering_radii, primary_radius, tile_step, tile_half_width]
+    required: [consensus_gaps, final_gap, minimum_region_sites, region_sensitivity, clustering_radii, primary_radius, tile_step, tile_half_width]
     properties:
       consensus_gaps:
         type: array
@@ -31,6 +31,26 @@ properties:
         items: {type: integer, minimum: 1}
       final_gap: {type: integer, minimum: 1}
       minimum_region_sites: {type: integer, minimum: 2}
+      region_sensitivity:
+        type: object
+        required: [core_gaps, minimum_sites, final_gaps]
+        properties:
+          core_gaps:
+            type: array
+            minItems: 3
+            uniqueItems: true
+            items: {type: integer, minimum: 1}
+          minimum_sites:
+            type: array
+            minItems: 2
+            uniqueItems: true
+            items: {type: integer, minimum: 2}
+          final_gaps:
+            type: array
+            minItems: 3
+            uniqueItems: true
+            items: {type: integer, minimum: 1}
+        additionalProperties: false
       clustering_radii:
         type: array
         minItems: 1

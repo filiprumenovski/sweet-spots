@@ -112,6 +112,20 @@
       "hash_matches_manifest": true,
       "nonempty": true,
       "path": "results/figures/Figure_S3.png"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S4",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S4.pdf"
+    },
+    {
+      "exists": true,
+      "figure": "Figure_S4",
+      "hash_matches_manifest": true,
+      "nonempty": true,
+      "path": "results/figures/Figure_S4.png"
     }
   ],
   "numerical_checks": [
@@ -148,6 +162,13 @@
       "claim_id": "regional_code.within_protein.auroc",
       "expected": 0.8743789354729757,
       "observed": 0.8743789354729757,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "regional_code.composition_within_protein.auroc",
+      "expected": 0.792152662273436,
+      "observed": 0.792152662273436,
       "passed": true
     },
     {

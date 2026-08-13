@@ -10,9 +10,9 @@ authors:
     given-names: Charlie
     affiliation: "Department of Chemistry, Wayne State University"
 repository-code: "https://github.com/filiprumenovski/sweet-spots"
-doi: "10.5281/zenodo.21922596"
-url: "https://doi.org/10.5281/zenodo.21922596"
-version: 1.0.2
+doi: "10.5281/zenodo.21922595"
+url: "https://doi.org/10.5281/zenodo.21922595"
+version: 1.0.3
 date-released: 2026-08-13
 license: MIT
 keywords:

@@ -13,7 +13,7 @@ dist/
 .env.*
 
 # Frozen input bundle (distributed separately)
-inputs/
+inputs
 
 # Workflow state and restartable intermediates
 .snakemake/

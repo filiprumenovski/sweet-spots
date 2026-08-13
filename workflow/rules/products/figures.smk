@@ -22,6 +22,8 @@ FIGURE_INPUTS = [
     rules.regional_code.output.proline,
     rules.regional_code.output.distance,
     rules.regional_code.output.summary,
+    rules.region_definition_catalogue_sensitivity.output,
+    rules.region_definition_model_sensitivity_reduce.output,
     rules.yin_yang.output.local,
     rules.yin_yang.output.nested,
     rules.yin_yang.output.kinase_sites,

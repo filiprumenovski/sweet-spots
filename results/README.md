@@ -7,7 +7,7 @@ and integrity of those products.
 | Directory | Contents | Primary formats |
 |---|---|---|
 | [`analysis/`](analysis/) | One directory per scientific analysis | CSV, JSON |
-| [`figures/`](figures/) | Five main and three supplemental figures | PDF, PNG |
+| [`figures/`](figures/) | Five main and four supplemental figures | PDF, PNG |
 | [`tables/`](tables/) | Tidy publication result ledger | CSV, Parquet |
 | [`provenance/`](provenance/) | Frozen-input identities and runtime versions | JSON |
 | [`audit/`](audit/) | Terminal numerical and figure-integrity report | JSON |

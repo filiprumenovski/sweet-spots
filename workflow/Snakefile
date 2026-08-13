@@ -18,6 +18,12 @@ SOURCE_ROOT = config["source_root"]
 RESULTS = config.get("results_root", "results")
 PTMS = ["oglcnac", "phospho", "acetylation", "ubiquitination"]
 OUTER_FOLDS = [str(value) for value in range(5)]
+REGION_SENSITIVITY_CORE_GAPS = [
+    str(value) for value in config["analysis"]["region_sensitivity"]["core_gaps"]
+]
+REGION_SENSITIVITY_MINIMUM_SITES = [
+    str(value) for value in config["analysis"]["region_sensitivity"]["minimum_sites"]
+]
 KINASE_SHARDS = [
     str(value) for value in range(config["parallel"]["kinase_scoring_shards"])
 ]
@@ -38,11 +44,13 @@ FIGURES = [
     "Figure_S1",
     "Figure_S2",
     "Figure_S3",
+    "Figure_S4",
 ]
 
 
 include: "rules/foundation/input_manifest.smk"
 include: "rules/foundation/consensus_regions.smk"
+include: "rules/analyses/region_definition_sensitivity.smk"
 include: "rules/analyses/self_clustering.smk"
 include: "rules/analyses/detection_aware_clustering.smk"
 include: "rules/analyses/evidence_restricted_clustering.smk"
@@ -61,5 +69,7 @@ rule all:
     input:
         f"{RESULTS}/audit/reproduction_report.json",
         f"{RESULTS}/tables/manuscript_result_ledger.parquet",
+        f"{RESULTS}/analysis/region_definition_sensitivity/catalogue_grid.csv",
+        f"{RESULTS}/analysis/region_definition_sensitivity/model_grid.csv",
         expand(f"{RESULTS}/figures/{{figure}}.pdf", figure=FIGURES),
         expand(f"{RESULTS}/figures/{{figure}}.png", figure=FIGURES),

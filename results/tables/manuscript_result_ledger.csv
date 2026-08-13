@@ -48,10 +48,11 @@ ogt.identity.peptide_contact_channel,4A,ogt_conservation,human to mouse identity
 ogt.identity.reading_surface,4A,ogt_conservation,human to mouse identity: reading_surface,1.0,,,fraction,OGT residue,results/analysis/ogt_conservation/summary.json
 regional_code.composition.auroc,2A,regional_code,composition held-out AUROC,0.8219988722110085,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
 regional_code.composition_matched.auroc,2A,regional_code,composition_matched held-out AUROC,0.7453894398885004,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
+regional_code.composition_within_protein.auroc,2C,regional_code,composition-only mean within-protein AUROC,0.792152662273436,0.7737033528096532,0.8097706704735037,AUROC,protein,results/analysis/regional_code/summary.json
 regional_code.full.auroc,2A,regional_code,full held-out AUROC,0.8788975288086618,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
 regional_code.geometry.auroc,2A,regional_code,geometry held-out AUROC,0.8424823603127468,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
 regional_code.geometry_matched.auroc,2A,regional_code,geometry_matched held-out AUROC,0.7203301978349169,,,AUROC,protein-grouped tile,results/analysis/regional_code/summary.json
-regional_code.within_protein.auroc,2C,regional_code,mean within-protein AUROC,0.8743789354729757,0.861297929794372,0.8867824173280383,AUROC,protein,results/analysis/regional_code/summary.json
+regional_code.within_protein.auroc,2C,regional_code,full-model mean within-protein AUROC,0.8743789354729757,0.861297929794372,0.8867824173280383,AUROC,protein,results/analysis/regional_code/summary.json
 scanner.baseline.auroc,5C;5D,scanner,baseline auroc,0.916824448633845,,,auroc,outer protein-grouped fold,results/analysis/scanner/summary.json
 scanner.baseline.average_precision,5C;5D,scanner,baseline average_precision,0.19096755406455435,,,average_precision,outer protein-grouped fold,results/analysis/scanner/summary.json
 scanner.enhanced.auroc,5C;5D,scanner,enhanced auroc,0.9296916915485249,,,auroc,outer protein-grouped fold,results/analysis/scanner/summary.json

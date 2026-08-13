@@ -1,6 +1,6 @@
 # Sweet spots
 
-[![Release: v1.0.2](https://img.shields.io/badge/release-v1.0.2-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.2)
+[![Release: v1.0.3](https://img.shields.io/badge/release-v1.0.3-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.3)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21922595.svg)](https://doi.org/10.5281/zenodo.21922595)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
@@ -9,11 +9,12 @@
 Reproducible analyses for *Sweet spots: how a promiscuous glycosyltransferase
 reads a conserved regional code*.
 
-This repository rebuilds the consensus O-GlcNAc region catalogue, every
-reported computational analysis, five main and three supplemental figures, a
+This repository rebuilds the operational O-GlcNAc region catalogue, every
+reported computational analysis, five main and four supplemental figures, a
 machine-readable result ledger, and the terminal integrity audit. Retained
 results are included for immediate inspection; the Snakemake workflow recreates
-them from frozen inputs.
+them from frozen inputs. The two-stage region construction is defined precisely
+in the [region definition guide](docs/region_definition.md).
 
 <p align="center">
   <img src="results/figures/Figure_1.png" width="100%" alt="O-GlcNAc sites form reproducible regional clusters across proteins and spatial scales">
@@ -66,6 +67,7 @@ immutable.
 | Product | Description |
 |---|---|
 | [`results/analysis/`](results/analysis/) | Transparent CSV and JSON output from each analysis |
+| [`results/analysis/region_definition_sensitivity/`](results/analysis/region_definition_sensitivity/) | Complete 45-definition catalogue grid and 15 protein-grouped model refits |
 | [`results/figures/`](results/figures/) | Vector PDF and 400 dpi PNG for every retained figure |
 | [`results/tables/manuscript_result_ledger.parquet`](results/tables/manuscript_result_ledger.parquet) | One row per reported estimand, materialized with DuckDB |
 | [`results/provenance/input_manifest.json`](results/provenance/input_manifest.json) | File hashes and directory-tree hashes for every frozen input |
@@ -115,6 +117,7 @@ sweet-spots/
 | Guide | Contents |
 |---|---|
 | [Input data](docs/input_data.md) | Frozen data contract, licenses, hashes, and installation |
+| [Region definition](docs/region_definition.md) | Strict core membership, final grouping, coordinates, and a worked example |
 | [Workflow architecture](docs/architecture.md) | Parallel execution, determinism, and failure behavior |
 | [Clustering breadth](docs/clustering_breadth.md) | Estimands, conditioned null, and inferential guardrails |
 | [Execution profiles](profiles/README.md) | Workstation and SLURM configuration |
@@ -140,10 +143,9 @@ for the canonical project authorship record.
 ## Citation and license
 
 Use the repository's `CITATION.cff` metadata or GitHub's **Cite this repository**
-menu to cite this software release. The archived v1.0.2 release is available at
-[doi:10.5281/zenodo.21922596](https://doi.org/10.5281/zenodo.21922596); use the
-[concept DOI](https://doi.org/10.5281/zenodo.21922595) to cite the software
-independently of version.
+menu to cite this software. The versioned archive series is collected under the
+[concept DOI](https://doi.org/10.5281/zenodo.21922595), which resolves to the
+latest deposited release while preserving every earlier version.
 
 The analysis code is available under the [MIT License](LICENSE). Input data
 retain the licenses and access conditions of their original providers; see the
