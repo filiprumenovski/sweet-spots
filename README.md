@@ -1,6 +1,6 @@
 # Sweet spots
 
-[![Release: v1.0.0](https://img.shields.io/badge/release-v1.0.0-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.0)
+[![Release: v1.0.1](https://img.shields.io/badge/release-v1.0.1-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.1)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
@@ -127,6 +127,14 @@ make check
 
 This runs Ruff, the unit test suite, and the lockfile consistency check. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for the review contract.
+
+## Authors and affiliation
+
+- **Filip Rumenovski** — lead author
+- **Charlie Fehl** — principal investigator
+
+Department of Chemistry, Wayne State University. See [AUTHORS.md](AUTHORS.md)
+for the canonical project authorship record.
 
 ## Citation and license
 

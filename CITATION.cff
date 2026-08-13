@@ -5,9 +5,13 @@ type: software
 authors:
   - family-names: Rumenovski
     given-names: Filip
+    affiliation: "Department of Chemistry, Wayne State University"
+  - family-names: Fehl
+    given-names: Charlie
+    affiliation: "Department of Chemistry, Wayne State University"
 repository-code: "https://github.com/filiprumenovski/sweet-spots"
 url: "https://github.com/filiprumenovski/sweet-spots"
-version: 1.0.0
+version: 1.0.1
 date-released: 2026-08-13
 license: MIT
 keywords:
