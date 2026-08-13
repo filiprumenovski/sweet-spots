@@ -1,17 +1,21 @@
 {
   "title": "Sweet spots: reproducibility workflow",
   "description": "Reproducible analyses, figures, tables, and integrity audits for the O-GlcNAc regional sequence code.",
+  "version": "1.0.1",
   "upload_type": "software",
   "access_right": "open",
-  "license": "MIT",
+  "license": "mit",
+  "language": "eng",
   "creators": [
     {
       "name": "Rumenovski, Filip",
-      "affiliation": "Department of Chemistry, Wayne State University"
+      "affiliation": "Department of Chemistry, Wayne State University",
+      "type": "Researcher"
     },
     {
       "name": "Fehl, Charlie",
-      "affiliation": "Department of Chemistry, Wayne State University"
+      "affiliation": "Department of Chemistry, Wayne State University",
+      "type": "ProjectLeader"
     }
   ],
   "keywords": [
