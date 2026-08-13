@@ -1,6 +1,6 @@
 [project]
 name = "sweet-spots-reproducibility"
-version = "1.0.3"
+version = "1.0.4"
 description = "Reproducible analyses for the O-GlcNAc regional sequence code"
 readme = "README.md"
 license = "MIT"
