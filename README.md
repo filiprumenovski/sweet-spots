@@ -11,20 +11,35 @@ analyses from the parent research repository are intentionally absent.
 
 ## Input data
 
-The workflow starts from a frozen, analysis-ready data bundle. It does not
-download data or call a remote service. `source_root` in `config/config.yaml`
-must point to a directory with the following files:
+The workflow starts from a frozen, analysis-ready data bundle. The openly
+redistributable portion is published as a versioned GitHub Release asset. From
+the repository root, install and checksum it with:
+
+```bash
+./scripts/fetch_open_inputs.sh
+```
+
+This creates the expected `inputs/` tree. Three source files are deliberately
+not redistributed because their providers do not give an explicit public
+redistribution grant: the O-GlcNAcAtlas evidence table, the MSU/RGAP rice
+sequence subset, and the unified PTM catalogue containing PhosphoSitePlus
+records. Place licensed copies at the paths marked **user supplied** below.
+See [`docs/input_data.md`](docs/input_data.md) for exact versions, byte counts,
+hashes, source links, and the redistribution decision.
+
+`source_root` in `config/config.yaml` must point to a directory with the
+following files:
 
 | Path below `source_root` | Contents | Used for |
 |---|---|---|
 | `data/interim/fasta_human.parquet` | Canonical human protein sequence spine | Consensus regions, self-clustering, regional models |
 | `data/interim/fasta_all.parquet` | Canonical multispecies protein sequence spine | Scanner validation, evolutionary transfer, FG-NUP background |
 | `data/interim/iupred_residue_scores.parquet` | Residue-level IUPred disorder scores | Covariate control, scanner features, matched FG-NUP analysis |
-| `analysis/revalidation/data/atlas_unambiguous.csv` | Strict sequence-validated O-GlcNAc site evidence with species and publication support | Region definition, labels, evolutionary comparisons |
-| `data/processed/landscape/ptm_unified.parquet` | Canonical O-GlcNAc, phosphorylation, acetylation, and ubiquitination site catalogue | Self-clustering and O-GlcNAc/phosphorylation analyses |
+| `analysis/revalidation/data/atlas_unambiguous.csv` **(user supplied)** | Strict sequence-validated O-GlcNAc site evidence with species and publication support | Region definition, labels, evolutionary comparisons |
+| `data/processed/landscape/ptm_unified.parquet` **(user supplied)** | Canonical O-GlcNAc, phosphorylation, acetylation, and ubiquitination site catalogue | Self-clustering and O-GlcNAc/phosphorylation analyses |
 | `data/processed/regions/oglcnac_consensus_regions.parquet` | Archived canonical consensus-region object | Independent checksum comparison of the rebuilt object |
 | `data/interim/msa/*.afa` | Per-protein human-to-ortholog alignments | Alignment-based site and regional conservation |
-| `data/external/multispecies_oglcnac/rice_sequences.fasta` | Rice sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
+| `data/external/multispecies_oglcnac/rice_sequences.fasta` **(user supplied)** | Rice sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
 | `data/external/multispecies_oglcnac/arabidopsis_sequences.fasta` | Arabidopsis sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
 | `data/external/multispecies_oglcnac/drosophila_sequences.fasta` | Drosophila sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
 | `data/external/multispecies_oglcnac/celegans_sequences.fasta` | *C. elegans* sequences linked to observed O-GlcNAc sites | Alignment-free cross-species transfer |
@@ -32,9 +47,11 @@ must point to a directory with the following files:
 | `analysis/revalidation/data/ogt_orthologs/orthologs_aln.fasta` | OGT ortholog alignment | Conservation of substrate-reading and catalytic surfaces |
 | `analysis/revalidation/data/ogt_structures/*.cif` | Experimentally determined OGT structures | Peptide-contact, surface, core, and interface assignments |
 
-The frozen development bundle contains 16,450 per-protein ortholog alignments
-and 44 OGT structure files. Kinase specificity matrices are supplied by the
-pinned `kinase-library==1.7.1` dependency rather than by a separate data file.
+The complete frozen input contract is 235,806,555 bytes. The open release asset
+installs 221,552,078 bytes, including 16,450 per-protein ortholog alignments and
+44 OGT structure files. The three user-supplied files total 14,254,477 bytes.
+Kinase specificity matrices are supplied by the pinned
+`kinase-library==1.7.1` dependency rather than by a separate data file.
 The first workflow rule verifies that every required path exists and writes
 relative paths, byte counts, SHA-256 hashes, and directory-tree hashes to
 `results/provenance/input_manifest.json`. This manifest is the authoritative
