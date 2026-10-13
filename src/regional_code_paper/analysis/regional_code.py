@@ -18,10 +18,10 @@ import pandas as pd
 import statsmodels.api as sm
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GroupKFold
 
 from ..core.config import load_config
 from ..core.randomness import stable_seed
+from ..core.validation import protein_group_folds
 
 COMPOSITION_FEATURES = (
     "acidic",
@@ -221,7 +221,7 @@ def grouped_predictions(tiles: pd.DataFrame, seed: int) -> dict[str, np.ndarray]
     output: dict[str, np.ndarray] = {}
     for name, columns in MODEL_FEATURES.items():
         scores = np.zeros(len(tiles), dtype=float)
-        for train, test in GroupKFold(5).split(tiles, labels, groups):
+        for train, test in protein_group_folds(groups):
             model = HistGradientBoostingClassifier(
                 max_iter=300,
                 max_depth=3,

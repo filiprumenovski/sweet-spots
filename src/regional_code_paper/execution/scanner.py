@@ -16,9 +16,9 @@ import numpy as np
 import pandas as pd
 from sklearn.base import clone
 from sklearn.metrics import average_precision_score, roc_auc_score
-from sklearn.model_selection import GroupKFold
 
 from ..core.io import write_csv, write_json, write_npz
+from ..core.validation import protein_group_folds
 from ..models.scanner import (
     QUANTILES,
     baseline_estimator,
@@ -65,7 +65,7 @@ def run_fold(cache: Path, metadata: Path, fold: int, output: Path, receipt: Path
         groups = data["groups"]
     document = json.loads(metadata.read_text(encoding="utf-8"))
     families = document["families"]
-    outer_train, outer_test = list(GroupKFold(5).split(legacy, labels, groups))[fold]
+    outer_train, outer_test = list(protein_group_folds(groups))[fold]
     candidates = {
         "legacy": (legacy, baseline_estimator()),
         "enhanced": (enhanced, make_region_classifier()),

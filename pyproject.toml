@@ -22,7 +22,7 @@ classifiers = [
 ]
 dependencies = [
     "biopython==1.85",
-    "duckdb==1.5.2",
+    "duckdb-cli==1.5.2",
     "kinase-library==1.7.1",
     "matplotlib==3.8.4",
     "numpy==2.4.3",

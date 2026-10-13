@@ -1,0 +1,330 @@
+{
+  "ledger": {
+    "claims": 82,
+    "differing_claims": 0,
+    "differences": []
+  },
+  "prediction_tables": {
+    "regional_code/held_out_tiles": {
+      "rows": 49394,
+      "differing_columns": [],
+      "maximum_absolute_error": {
+        "center": 0.0,
+        "label": 0.0,
+        "disorder": 0.0,
+        "st_fraction": 0.0,
+        "acidic": 0.0,
+        "alanine": 0.0,
+        "aromatic": 0.0,
+        "proline": 0.0,
+        "qn": 0.0,
+        "charge": 0.0,
+        "hydrophobic": 0.0,
+        "geo_st": 0.0,
+        "geo_gapmean": 0.0,
+        "geo_gapsd": 0.0,
+        "geo_close": 0.0,
+        "disorder_score": 0.0,
+        "st_only_score": 0.0,
+        "covariates_score": 0.0,
+        "composition_score": 0.0,
+        "geometry_score": 0.0,
+        "full_score": 0.0
+      }
+    },
+    "scanner/outer_predictions": {
+      "rows": 314040,
+      "differing_columns": [],
+      "maximum_absolute_error": {
+        "center": 0.0,
+        "label": 0.0,
+        "fold": 0.0,
+        "baseline_score": 0.0,
+        "enhanced_score": 0.0,
+        "selected_score": 0.0
+      }
+    }
+  },
+  "region_sensitivity": {
+    "rows": 15,
+    "differing_columns": []
+  },
+  "inputs": {
+    "files_equal": true,
+    "directory_hashes_equal": true
+  },
+  "audit": {
+    "computational_pass": true,
+    "figure_checks": [
+      {
+        "exists": true,
+        "figure": "Figure_1",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_1.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_1",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_1.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_2",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_2.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_2",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_2.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_3",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_3.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_3",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_3.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_4",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_4.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_4",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_4.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_5",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_5.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_5",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_5.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S1",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S1.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S1",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S1.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S2",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S2.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S2",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S2.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S3",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S3.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S3",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S3.png"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S4",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S4.pdf"
+      },
+      {
+        "exists": true,
+        "figure": "Figure_S4",
+        "hash_matches_manifest": true,
+        "nonempty": true,
+        "path": "results/figures/Figure_S4.png"
+      }
+    ],
+    "numerical_checks": [
+      {
+        "absolute_error": 0.0,
+        "claim_id": "object.regions",
+        "expected": 824,
+        "observed": 824.0,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "object.region_sites",
+        "expected": 4196,
+        "observed": 4196.0,
+        "passed": true
+      },
+      {
+        "absolute_error": 8.881784197001252e-16,
+        "claim_id": "clustering.r10",
+        "expected": 4.073557885388373,
+        "observed": 4.073557885388374,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.full.auroc",
+        "expected": 0.8788975288086618,
+        "observed": 0.8788975288086618,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.within_protein.auroc",
+        "expected": 0.8743789354729757,
+        "observed": 0.8743789354729757,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.composition_within_protein.auroc",
+        "expected": 0.792152662273436,
+        "observed": 0.792152662273436,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.composition.auroc",
+        "expected": 0.8219988722110085,
+        "observed": 0.8219988722110085,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.composition_matched.auroc",
+        "expected": 0.7453894398885004,
+        "observed": 0.7453894398885004,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.geometry.auroc",
+        "expected": 0.8424823603127468,
+        "observed": 0.8424823603127468,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "regional_code.geometry_matched.auroc",
+        "expected": 0.7203301978349169,
+        "observed": 0.7203301978349169,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "scanner.baseline.auroc",
+        "expected": 0.916824448633845,
+        "observed": 0.916824448633845,
+        "passed": true
+      },
+      {
+        "absolute_error": 5.551115123125783e-17,
+        "claim_id": "scanner.baseline.average_precision",
+        "expected": 0.19096755406455435,
+        "observed": 0.1909675540645543,
+        "passed": true
+      },
+      {
+        "absolute_error": 1.1102230246251565e-16,
+        "claim_id": "scanner.enhanced.auroc",
+        "expected": 0.9296916915485249,
+        "observed": 0.9296916915485248,
+        "passed": true
+      },
+      {
+        "absolute_error": 5.551115123125783e-17,
+        "claim_id": "scanner.enhanced.average_precision",
+        "expected": 0.21863497621947386,
+        "observed": 0.2186349762194738,
+        "passed": true
+      },
+      {
+        "absolute_error": 1.1102230246251565e-16,
+        "claim_id": "scanner.selected.auroc",
+        "expected": 0.9296916915485249,
+        "observed": 0.9296916915485248,
+        "passed": true
+      },
+      {
+        "absolute_error": 5.551115123125783e-17,
+        "claim_id": "scanner.selected.average_precision",
+        "expected": 0.21863497621947386,
+        "observed": 0.2186349762194738,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "kinome.delta_n90",
+        "expected": -5.291756173032191,
+        "observed": -5.291756173032191,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "evolution.worm.gap",
+        "expected": 0.401840490797546,
+        "observed": 0.401840490797546,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "transfer.human_to_target.rice",
+        "expected": 0.8065612089584693,
+        "observed": 0.8065612089584693,
+        "passed": true
+      },
+      {
+        "absolute_error": 0.0,
+        "claim_id": "fg_nup.recovery_fraction",
+        "expected": 0.8,
+        "observed": 0.8,
+        "passed": true
+      }
+    ],
+    "status": "reproduced"
+  }
+}
