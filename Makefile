@@ -17,7 +17,7 @@ inputs: ## Download and verify the openly redistributable inputs
 	./scripts/fetch_open_inputs.sh
 
 validate-inputs: ## Validate the complete frozen input tree
-	uv run --frozen python -m regional_code_paper.reporting.input_manifest --config config/config.yaml --output results/provenance/input_manifest.json
+	uv run --frozen python -m regional_code_paper.reporting.input_manifest --config config/config.yaml --output results/provenance/input_manifest.json --validate-only
 
 dry-run: ## Resolve the complete workflow without executing jobs
 	$(SNAKEMAKE) --profile $(LOCAL_PROFILE) --dry-run --forceall $(SNAKEMAKE_ARGS)

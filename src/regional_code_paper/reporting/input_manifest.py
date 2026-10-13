@@ -124,6 +124,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--validate-only", action="store_true")
     args = parser.parse_args()
     try:
         manifest = build_manifest(args.config)
@@ -136,7 +137,9 @@ def main() -> None:
         )
         raise
     write_json(args.output.with_name("input_validation.json"), {"passed": True})
-    # An unchanged preflight must not invalidate every downstream analysis.
+    if args.validate_only:
+        return
+    # Unchanged content must not invalidate downstream analysis.
     if not args.output.exists() or json.loads(args.output.read_text()) != manifest:
         write_json(args.output, manifest)
 

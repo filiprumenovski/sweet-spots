@@ -65,3 +65,30 @@ def test_nonfinite_observation_fails_but_report_remains_serializable():
     checks = table_checks(observed, expected, "claim_id")
     assert not all(item["passed"] for item in checks)
     json.dumps(checks, allow_nan=False)
+
+
+def test_preflight_leaves_manifest_creation_to_snakemake(tmp_path, monkeypatch):
+    import sys
+
+    from regional_code_paper.reporting import input_manifest
+
+    config = tmp_path / "config/config.yaml"
+    config.parent.mkdir()
+    config.write_text("source_root: inputs\nresults_root: results\n")
+    reference = tmp_path / "reference"
+    reference.mkdir()
+    expected = json.loads((REFERENCE / "input_manifest.json").read_text())
+    (reference / "input_manifest.json").write_text(json.dumps(expected))
+    output = tmp_path / "results/provenance/input_manifest.json"
+    monkeypatch.setattr(input_manifest, "build_manifest", lambda _: expected)
+    command = ["manifest", "--config", str(config), "--output", str(output)]
+    monkeypatch.setattr(sys, "argv", [*command, "--validate-only"])
+    input_manifest.main()
+    assert not output.exists()
+    assert json.loads(output.with_name("input_validation.json").read_text())["passed"]
+    monkeypatch.setattr(sys, "argv", command)
+    input_manifest.main()
+    assert json.loads(output.read_text()) == expected
+    before = output.stat().st_mtime_ns
+    input_manifest.main()
+    assert output.stat().st_mtime_ns == before

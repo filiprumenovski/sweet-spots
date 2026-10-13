@@ -32,7 +32,9 @@ values are accepted only where the reference has a missing value.
 The report-writing job succeeds even when a comparison fails, preserving
 `results/audit/reproduction_report.json`. A separate `audit` rule refuses to
 create `results/audit/PASS`. `make review` renders the reviewer report before
-running this gate. Input failures leave `results/provenance/input_validation.json`.
+running this gate. Input failures leave `results/provenance/input_validation.json`. The Make
+preflight only validates; the Snakemake rule owns canonical manifest creation
+and its workflow provenance.
 A green historical report is not evidence of a new run: use the fresh report,
 logs, and `results/review/source_hashes.json` from the run being reviewed.
 
