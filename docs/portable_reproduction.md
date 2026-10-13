@@ -92,9 +92,10 @@ and separated preflight validation from tracked manifest creation. All 44
 scientific source/configuration/analysis-rule/dependency files remained
 byte-identical to the compute snapshot.
 
-Final validation job **40603479** passed 39 tests, registered the input manifest's
-workflow provenance without changing its bytes, and regenerated the review
-report at code commit `b8701bc`. `make review` passed, and a subsequent default
+Provenance validation job **40603479** registered the input manifest without
+changing its bytes. Final report job **40603489** passed 40 tests and regenerated
+the report at code commit `10aad02`, with every hashed source file and figure input
+tracked directly by the DAG. `make review` passed, and a subsequent default
 `make reproduce --dry-run` reported nothing to do, with no missing metadata.
 
 The integrated audit passed all 82 claims with confidence intervals and metadata,
