@@ -1,0 +1,3 @@
+# Keep generated artwork and run evidence out of the default code-review diff.
+assets/review_figures/*.svg linguist-generated=true
+results/** linguist-generated=true
