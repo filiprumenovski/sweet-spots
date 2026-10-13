@@ -1,11 +1,20 @@
 """Write durable evidence before the separate fail-closed gate."""
 
+import json
+
+EDITORIAL_SOURCES = json.loads(Path("assets/review_figures/manifest.json").read_text())["sources"]
+
+
 rule audit_report:
     input:
         code=CORE_CODE + ["src/regional_code_paper/reporting/audit.py",
               "src/regional_code_paper/reporting/editorial.py",
               "src/regional_code_paper/reporting/input_manifest.py"],
         editorial=sorted(str(path) for path in Path("assets/review_figures").rglob("*") if path.is_file()),
+        editorial_sources=[
+            f"{RESULTS}/{path.removeprefix('results/')}" if path.startswith("results/") else path
+            for path in EDITORIAL_SOURCES
+        ],
         ledger=rules.result_ledger_csv.output,
         parquet=rules.result_ledger_parquet.output,
         manifest=rules.input_manifest.output,

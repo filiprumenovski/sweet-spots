@@ -1,11 +1,13 @@
 """An offline, source-linked report of every claim and figure."""
 
+from regional_code_paper.reporting.review import source_files
+
+
 rule reviewer_report:
     input:
         audit=rules.audit_report.output,
-        code=CORE_CODE + ["src/regional_code_paper/reporting/review.py"],
-        workflow=sorted(str(path) for path in Path("workflow").rglob("*.smk")),
-        snakefile="workflow/Snakefile",
+        code=[str(path) for path in source_files(Path("."))],
+        sources=rules.audit_report.input,
     output:
         html=f"{RESULTS}/review/index.html",
         dot=f"{RESULTS}/review/workflow.dot",

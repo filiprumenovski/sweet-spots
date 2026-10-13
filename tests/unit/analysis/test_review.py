@@ -6,7 +6,7 @@ from xml.etree import ElementTree
 import pytest
 
 from regional_code_paper.reporting.editorial import editorial_checks, equal_values
-from regional_code_paper.reporting.review import graph_svg
+from regional_code_paper.reporting.review import graph_svg, source_files
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -35,3 +35,27 @@ def test_editorial_panel_inventory_is_complete_and_assets_unchanged():
     # These checks also run before a clean full build, when result sources do not exist.
     assets = [c for c in checks if c.get("method") == "asset SHA-256" or "check" in c]
     assert all(check["passed"] for check in assets), [c for c in assets if not c["passed"]]
+
+
+def test_report_hashes_and_dag_share_the_same_source_inventory(tmp_path):
+    for name in (
+        "src/model.py",
+        "src/folds.json",
+        "workflow/Snakefile",
+        "config/new.yaml",
+        "src/cache.pyc",
+        "results/generated.json",
+    ):
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+    names = {str(p.relative_to(tmp_path)) for p in source_files(tmp_path)}
+    assert names == {
+        "src/model.py",
+        "src/folds.json",
+        "workflow/Snakefile",
+        "config/new.yaml",
+        "pyproject.toml",
+        "uv.lock",
+        "Makefile",
+    }

@@ -61,6 +61,16 @@ def graph_svg(dot: str) -> str:
     return "".join(parts) + "</svg>"
 
 
+def source_files(project: Path) -> list[Path]:
+    paths = sorted(
+        p
+        for folder in ("src", "workflow", "config")
+        for p in (project / folder).rglob("*")
+        if p.suffix in (".py", ".smk", ".yaml", ".json") or p.name == "Snakefile"
+    )
+    return [*paths, project / "pyproject.toml", project / "uv.lock", project / "Makefile"]
+
+
 def render(project: Path, results: Path, output: Path) -> None:
     output.mkdir(parents=True, exist_ok=True)
     audit = json.loads((results / "audit/reproduction_report.json").read_text())
@@ -86,16 +96,9 @@ def render(project: Path, results: Path, output: Path) -> None:
     atomic_write_text(output / "workflow.dot", dot)
     svg = graph_svg(dot)
     atomic_write_text(output / "workflow.svg", svg)
-    source_files = sorted(
-        p
-        for folder in ("src", "workflow", "config")
-        for p in (project / folder).rglob("*")
-        if p.suffix in (".py", ".smk", ".yaml", ".json") or p.name == "Snakefile"
-    )
-    source_files += [project / "pyproject.toml", project / "uv.lock", project / "Makefile"]
     write_json(
         output / "source_hashes.json",
-        {str(p.relative_to(project)): sha256_file(p) for p in source_files},
+        {str(p.relative_to(project)): sha256_file(p) for p in source_files(project)},
     )
 
     def link(path: Path, label: str | None = None) -> str:
