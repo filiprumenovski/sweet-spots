@@ -7,6 +7,7 @@ REGION_SENSITIVITY_WORK = f"{RESULTS}/work/region_definition_sensitivity"
 
 rule region_definition_catalogue_sensitivity:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
         primary=rules.consensus_regions.output.regions,
     output:
@@ -24,6 +25,7 @@ rule region_definition_catalogue_sensitivity:
 
 rule region_definition_model_sensitivity:
     input:
+        code=SCIENCE_CODE,
         validation="src/regional_code_paper/core/validation_folds.json",
         manifest=rules.input_manifest.output,
         primary=rules.consensus_regions.output.regions,
@@ -48,7 +50,8 @@ rule region_definition_model_sensitivity:
 
 rule region_definition_model_sensitivity_reduce:
     input:
-        expand(
+        code=SCIENCE_CODE,
+        models=expand(
             f"{REGION_SENSITIVITY_WORK}/core{{core_gap}}_min{{minimum_sites}}.json",
             core_gap=REGION_SENSITIVITY_CORE_GAPS,
             minimum_sites=REGION_SENSITIVITY_MINIMUM_SITES,
@@ -63,4 +66,4 @@ rule region_definition_model_sensitivity_reduce:
         disk_mb=config["resources"]["default"]["disk_mb"],
     shell:
         "uv run --frozen python -m regional_code_paper.analysis.region_definition_sensitivity "
-        "reduce --inputs {input:q} --output {output:q} > {log:q} 2>&1"
+        "reduce --inputs {input.models:q} --output {output:q} > {log:q} 2>&1"

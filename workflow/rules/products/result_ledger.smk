@@ -3,6 +3,7 @@
 
 rule result_ledger_csv:
     input:
+        code=CORE_CODE + ["src/regional_code_paper/reporting/result_ledger.py"],
         regions=rules.consensus_regions.output.summary,
         clustering=rules.self_clustering.output.ratios,
         clustering_breadth=rules.clustering_breadth.output.summary,
@@ -31,7 +32,8 @@ rule result_ledger_csv:
 
 rule result_ledger_parquet:
     input:
-        rules.result_ledger_csv.output,
+        code=CORE_CODE + ["src/regional_code_paper/reporting/result_ledger.py"],
+        csv=rules.result_ledger_csv.output,
     output:
         f"{RESULTS}/tables/manuscript_result_ledger.parquet",
     log:
@@ -42,5 +44,5 @@ rule result_ledger_parquet:
         disk_mb=2000,
     shell:
         "mkdir -p {RESULTS}/tables && "
-        "uv run --frozen duckdb -c \"COPY (SELECT * FROM read_csv_auto('{input}')) "
+        "uv run --frozen duckdb -c \"COPY (SELECT * FROM read_csv_auto('{input.csv}')) "
         "TO '{output}' (FORMAT PARQUET, COMPRESSION ZSTD);\" > {log:q} 2>&1"

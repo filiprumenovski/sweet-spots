@@ -82,10 +82,15 @@ After adding the three user-supplied files, verify the complete tree before
 launching any analysis:
 
 ```bash
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/local \
-  results/provenance/input_manifest.json
+make validate-inputs
 ```
 
-The rule fails on missing required files and records their content hashes.
-Compare the generated manifest with the archived identity record to confirm
-exact input versions; generating a manifest alone does not enforce those hashes.
+The preflight rejects missing or changed input files, paths and directory
+membership against `reference/input_manifest.json`. Runtime versions are
+recorded separately and do not replace content verification. `make reproduce`
+and `make review` repeat this preflight on every invocation, even when Snakemake
+would reuse an existing manifest. A failure leaves
+`results/provenance/input_validation.json` with the reason.
+
+Unchanged inputs do not rewrite the input manifest or invalidate downstream work.
+See [the reviewer workflow](review.md) for the complete checks.

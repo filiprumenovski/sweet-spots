@@ -5,7 +5,7 @@ SNAKEMAKE_ARGS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install inputs validate-inputs dry-run reproduce lint test check
+.PHONY: help install inputs validate-inputs dry-run reproduce lint test check review
 
 help: ## Show the available commands
 	@awk 'BEGIN {FS = ":.*## "; printf "Usage: make <target>\n\n"} /^[a-zA-Z_-]+:.*## / {printf "  %-16s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -24,6 +24,10 @@ dry-run: ## Resolve the complete workflow without executing jobs
 
 reproduce: validate-inputs ## Rebuild all analyses, figures, tables, and audits
 	$(SNAKEMAKE) --profile $(LOCAL_PROFILE) $(SNAKEMAKE_ARGS)
+
+review: validate-inputs ## Build the complete reviewer report and enforce its audit
+	$(SNAKEMAKE) --profile $(LOCAL_PROFILE) results/review/index.html $(SNAKEMAKE_ARGS)
+	$(SNAKEMAKE) --profile $(LOCAL_PROFILE) results/audit/PASS $(SNAKEMAKE_ARGS)
 
 lint: ## Run static checks
 	uv run --group dev ruff check src tests

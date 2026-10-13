@@ -5,6 +5,7 @@ YIN_PREP = f"{RESULTS}/work/yin_yang/prepared"
 
 rule yin_yang_prepare:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
         regions=rules.consensus_regions.output.regions,
         sites=rules.consensus_regions.output.sites,
@@ -27,6 +28,7 @@ rule yin_yang_prepare:
 
 rule kinase_scoring_shard:
     input:
+        code=SCIENCE_CODE,
         pairs=rules.yin_yang_prepare.output.pairs,
     output:
         sites=f"{RESULTS}/work/yin_yang/kinase/shard_{{shard}}.sites.csv",
@@ -52,6 +54,7 @@ rule kinase_scoring_shard:
 
 rule yin_yang:
     input:
+        code=SCIENCE_CODE,
         prepared=rules.yin_yang_prepare.output,
         site_shards=expand(f"{RESULTS}/work/yin_yang/kinase/shard_{{shard}}.sites.csv", shard=KINASE_SHARDS),
         sum_shards=expand(f"{RESULTS}/work/yin_yang/kinase/shard_{{shard}}.scores.npz", shard=KINASE_SHARDS),

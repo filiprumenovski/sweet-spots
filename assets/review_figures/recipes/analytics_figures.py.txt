@@ -1,0 +1,404 @@
+"""Rebuild verified quantitative panels; retain unmatched legacy panels as vectors.
+
+No model fitting or synthetic observations. All raw inputs remain unchanged.
+"""
+from pathlib import Path
+import sys,json,hashlib,textwrap,io,shutil
+B=Path(__file__).resolve().parents[1]
+sys.path[:0]=[str(B/'work/figure_vendor'),'/tmp/sweet-review/vendor']
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib import font_manager
+import numpy as np
+import pandas as pd
+import pymupdf as fitz
+R=Path('<ARCHIVED_REPOSITORY>/results')
+OLD=Path('<AUTHOR_HANDOFF>')
+O=B/'outputs/Figures_Analytics_Review';O.mkdir(exist_ok=True)
+TMP=B/'work/figure_analytics';TMP.mkdir(exist_ok=True)
+for fn in ['Arial.ttf','Arial Bold.ttf']:
+ font_manager.fontManager.addfont('/System/Library/Fonts/Supplemental/'+fn)
+INK='#18313f'; BLUE='#247aa5'; TEAL='#16857d'; CORAL='#ca604e'; GOLD='#b68c3c'; GREY='#87949c'; LIGHT='#dfe9ed'; PURPLE='#807299'
+plt.rcParams.update({'font.family':'Arial','font.size':8,'axes.labelsize':8,'xtick.labelsize':7.5,'ytick.labelsize':7.5,'legend.fontsize':7,'axes.linewidth':.65,'axes.edgecolor':'#8f9ba2','axes.labelcolor':INK,'text.color':INK,'xtick.color':INK,'ytick.color':INK,'lines.linewidth':1.5,'lines.markersize':4,'pdf.fonttype':42,'svg.fonttype':'none','savefig.dpi':300})
+USED={}; MAN=[]; CHANGES=[]; VERIFIED={}
+def track(p):
+ USED[str(p)]=hashlib.sha256(p.read_bytes()).hexdigest();return p
+def csv(n):return pd.read_csv(track(R/'analysis'/f'{n}.csv'))
+def js(n):return json.loads(track(R/'analysis'/f'{n}/summary.json').read_text())
+def clean(ax):
+ ax.spines[['top','right']].set_visible(False);ax.tick_params(length=3,width=.65);ax.set_axisbelow(True)
+ ax.grid(axis='y',color='#edf0f2',lw=.6)
+def null(ax,v=1,axis='y'):
+ (ax.axhline if axis=='y' else ax.axvline)(v,c=GREY,lw=.8,ls=(0,(3,3)),zorder=0)
+def label(ax,letter,title):
+ ax._panel=(letter,title)
+def layout(n,title,mosaic,height=7.5,ratios=None):
+ heights={'1':8.8,'2':9.0,'3':6.3,'4':8.0,'5':8.5,'S1':7.8,'S2':8.0,'S3':8.0,'S4':6.5}
+ height=heights.get(str(n),height)
+ fig=plt.figure(figsize=(7.5,height));axes=fig.subplot_mosaic(mosaic,gridspec_kw={'height_ratios':ratios,'hspace':.78,'wspace':.60})
+ fig.subplots_adjust(left=.17,right=.975,top=1-(1.22 if str(n)=='S3' else .82)/height,bottom=(1.25 if str(n)=='2' else .95)/height)
+ fig.text(.045,1-.25/height,f'{n}  |  {title}',fontsize=10,color=INK)
+ fig._panels=axes
+ for ax in axes.values():
+  clean(ax);ax._slot=ax.get_position().frozen()
+ return fig,axes
+
+from legacy_panel_layout import install, composite, AUDIT
+GEOMETRY=[];GUTTERS=[];ROW_GAPS=[]
+def legacy(ax,old,box):
+ install(ax,old,box,B,OLD,track)
+ CHANGES.append({'figure':CURRENT,'panel':ax._panel[0],'method':'original vector data aligned to native axes; labels reset','source_figure':old})
+def pack_columns(fig,n,attempt=0):
+ # Measure axis decorations in physical points before allocating the gutter.
+ fig.canvas.draw();renderer=fig.canvas.get_renderer();scale=72/fig.dpi
+ pairs=[ax for ax in fig._panels.values() if ax._slot.width<.5]
+ if not pairs:return
+ left=[ax for ax in pairs if ax._slot.x0<.5];right=[ax for ax in pairs if ax._slot.x0>.5]
+ def extent(ax):
+  boxes=[a.get_tightbbox(renderer) for a in [ax]+getattr(ax,'_layout_children',[])]
+  return min(b.x0 for b in boxes)*scale,max(b.x1 for b in boxes)*scale
+ def overhang(ax):
+  lo,hi=extent(ax);pos=ax.get_position()
+  return max(0,pos.x0*540-lo),max(0,hi-pos.x1*540)
+ spanning=[ax for ax in fig._panels.values() if ax not in pairs and not (n=='5' and ax._panel[0]=='A')]
+ lm=max(overhang(ax)[0] for ax in left+spanning);rm=max(overhang(ax)[1] for ax in right+spanning)
+ li=max(overhang(ax)[1] for ax in left);ri=max(overhang(ax)[0] for ax in right)
+ outer=24.3;gutter=18.;start=outer+lm;end=526.5-rm
+ width=(end-start-li-ri-gutter)/2;second=start+width+li+gutter+ri
+ assert width>140,(n,width)
+ fig._header_right=(start+width+li+gutter)/540
+ for ax in pairs:
+  old=ax.get_position().frozen();x=start if ax in left else second
+  for child in getattr(ax,'_layout_children',[]):
+   p=child.get_position();child.set_position([(x+(p.x0-old.x0)/old.width*width)/540,p.y0,p.width/old.width*width/540,p.height])
+  ax.set_position([x/540,old.y0,width/540,old.height])
+ # Full-width data panels and their sequence strips share the outer plot edges.
+ for ax in fig._panels.values():
+  if ax not in pairs and not (n=='5' and ax._panel[0]=='A'):
+   old=ax.get_position().frozen()
+   for child in getattr(ax,'_layout_children',[]):
+    p=child.get_position();child.set_position([(start+(p.x0-old.x0)/old.width*(end-start))/540,p.y0,p.width/old.width*(end-start)/540,p.height])
+   ax.set_position([start/540,old.y0,(end-start)/540,old.height])
+ fig.canvas.draw();renderer=fig.canvas.get_renderer()
+ rows={}
+ for ax in pairs:rows.setdefault(round(ax._slot.y1,8),[]).append(ax)
+ clearances=[]
+ for axes in rows.values():
+  if len(axes)==2:
+   axes.sort(key=lambda a:a.get_position().x0)
+   gap=extent(axes[1])[0]-extent(axes[0])[1]
+   if gap<gutter-.1 and attempt<3:return pack_columns(fig,n,attempt+1)
+   assert gap>=gutter-.1,(n,gap)
+   clearances.append({'panels':[a._panel[0] for a in axes],'clearance_points':gap})
+ GUTTERS.append({'figure':n,'minimum_clearance_points':gutter,'plot_width_points':width,'axis_to_axis_gap_points':li+gutter+ri,'rows':clearances})
+def pack_rows(fig,n):
+ # Translate whole rows in physical points, preserving plot and font sizes.
+ fig.canvas.draw();renderer=fig.canvas.get_renderer();scale=72/fig.dpi
+ height=fig.get_figheight()*72;rows={}
+ for ax in fig._panels.values():
+  row=rows.setdefault(round(ax._slot.y1,8),{'panels':[],'axes':[],'headers':[]})
+  row['panels'].append(ax._panel[0]);row['axes'] += [ax]+getattr(ax,'_layout_children',[]);row['headers'] += ax._headers
+ rows=[rows[k] for k in sorted(rows,reverse=True)]
+ assigned={ax for row in rows for ax in row['axes']}
+ for ax in fig.axes:
+  if ax not in assigned:
+   row=min(rows,key=lambda r:min(abs(ax.get_position().y0-a.get_position().y0) for a in r['axes']))
+   row['axes'].append(ax)
+ def bounds(row):
+  boxes=[a.get_tightbbox(renderer) for a in row['axes']]+[t.get_window_extent(renderer) for t in row['headers']]
+  return min(b.y0 for b in boxes)*scale,max(b.y1 for b in boxes)*scale
+ previous=None;shift=0;checks=[]
+ for row in rows:
+  lo,hi=bounds(row)
+  if previous is not None:
+   gap=previous-hi
+   shift=gap-12.
+   checks.append({'upper_panels':prior['panels'],'lower_panels':row['panels'],'previous_clearance_points':gap-prior['shift'],'clearance_points':12.})
+  row['shift']=shift;previous=lo+shift;prior=row
+ reduction=rows[-1]['shift'];newheight=height-reduction
+ positions={ax:ax.get_position(original=True).frozen() for ax in fig.axes}
+ header_shifts={t:row['shift'] for row in rows for t in row['headers']}
+ fig.set_size_inches(7.5,newheight/72)
+ for row in rows:
+  for ax in row['axes']:
+   p=positions[ax];ax.set_position([p.x0,(p.y0*height+row['shift']-reduction)/newheight,p.width,p.height*height/newheight])
+ for t in fig.texts:
+  x,y=t.get_position();t.set_position((x,(y*height+header_shifts.get(t,0)-reduction)/newheight))
+ fig.canvas.draw();renderer=fig.canvas.get_renderer()
+ for upper,lower,check in zip(rows,rows[1:],checks):
+  check['clearance_points']=bounds(upper)[0]-bounds(lower)[1]
+  assert abs(check['clearance_points']-12)<.1,(n,check)
+ ROW_GAPS.append({'figure':n,'previous_height_points':height,'height_points':newheight,'removed_points':reduction,'rows':checks})
+
+def finish(fig,n,note):
+ fig.canvas.draw();renderer=fig.canvas.get_renderer()
+ for ax in fig.axes:
+  for artist,dimension,setter in [(ax.yaxis.label,'height',ax.set_ylabel),(ax.xaxis.label,'width',ax.set_xlabel)]:
+   text=artist.get_text();extent=getattr(artist.get_window_extent(renderer),dimension);available=getattr(ax.get_window_extent(renderer),dimension)
+   if text and '\n' not in text and extent>available*1.04:
+    setter(textwrap.fill(text,max(15,int(len(text)*available/extent*.92))))
+ pack_columns(fig,n)
+ if n=='S2':
+  # A/B need only their own label margin, not C's long configuration labels.
+  fig.canvas.draw();renderer=fig.canvas.get_renderer()
+  axes=[fig._panels[k] for k in 'AB']
+  left=24.3+max(ax.get_position().x0*540-ax.get_tightbbox(renderer).x0*72/fig.dpi for ax in axes)
+  for ax in axes:
+   p=ax.get_position();ax.set_position([left/540,p.y0,(526.5-left)/540,p.height])
+ # Headers belong to panel slots, not to axis labels or the plotted data.
+ for key,ax in fig._panels.items():
+  pos=ax._slot;letter,title=ax._panel
+  x=.045 if pos.x0<.5 else fig._header_right
+  y=pos.y1+(.48 if n=='S3' and key in 'AB' else .48 if n=='3' and key in 'CD' else .15)/fig.get_figheight()
+  ax._headers=[fig.text(x,y,letter,fontsize=9,fontweight='normal',color=BLUE,va='bottom'),
+               fig.text(x+.027,y,title,fontsize=8,fontweight='normal',va='bottom')]
+ pack_rows(fig,n)
+ for key,ax in fig._panels.items():
+  pos=ax._slot
+  p=ax.get_position()
+  GEOMETRY.append({'figure':n,'panel':key,'plot_rect_points':[v for v in (p.x0*540,p.y0*fig.get_figheight()*72,p.x1*540,p.y1*fig.get_figheight()*72)],'slot_row_top':round(pos.y1,8)})
+  if n=='1' and key=='A':
+   p=ax._layout_children[0].get_position();GEOMETRY[-1]['sequence_strip_rect_points']=[p.x0*540,p.y0*fig.get_figheight()*72,p.x1*540,p.y1*fig.get_figheight()*72]
+ for ax in fig.axes:
+  if hasattr(ax,'_audit_index'):
+   p=ax.get_position();AUDIT[ax._audit_index]['target_plot_rect_points']=[p.x0*540,p.y0*fig.get_figheight()*72,p.x1*540,p.y1*fig.get_figheight()*72]
+ fig.text(.045,.16/fig.get_figheight(),textwrap.fill(note,160),fontsize=5.8,color='#5a6c77',va='bottom',linespacing=1.35)
+ fig.canvas.draw();p=O/f'Figure_{n}.pdf';foreground=TMP/f'{n}_foreground.pdf'
+ fig.savefig(foreground,transparent=True)
+ d=fitz.open(foreground);composite(fig,d,p);d.close();d=fitz.open(p)
+ d[0].get_pixmap(dpi=220).save(O/f'Figure_{n}.png')
+ (O/f'Figure_{n}.svg').write_text(d[0].get_svg_image(text_as_path=False))
+ plt.close(fig)
+ MAN.append({'figure':n,'pdf':str(p),'page_inches':[round(d[0].rect.width/72,3),round(d[0].rect.height/72,3)]});d.close()
+ print('SAVED',n,flush=True)
+def roc(y,s):
+ y=np.asarray(y);s=np.asarray(s);assert set(np.unique(y))=={0,1};assert np.isfinite(s).all()
+ order=np.argsort(-s,kind='stable');yy=y[order];ss=s[order];ends=np.r_[np.where(np.diff(ss)!=0)[0],len(ss)-1]
+ tp=np.r_[0,np.cumsum(yy)[ends]]/yy.sum();fp=np.r_[0,np.cumsum(1-yy)[ends]]/(len(yy)-yy.sum())
+ auc=float(np.trapezoid(tp,fp));return fp,tp,auc
+def forest(ax,labels,values,low=None,high=None,colors=None):
+ y=np.arange(len(labels))[::-1];colors=colors or [BLUE]*len(labels)
+ for i,(v,c) in enumerate(zip(values,colors)):
+  if low is not None:ax.plot([low[i],high[i]],[y[i],y[i]],color=c,lw=1.7)
+  ax.scatter(v,y[i],s=27,color=c,zorder=3)
+ labels=[textwrap.fill(str(v),16) if len(labels)<7 else str(v) for v in labels]
+ ax.set_yticks(y,labels);ax.set_ylim(-.65,len(labels)-.35);ax.grid(False);ax.grid(axis='x',color='#edf0f2')
+def intervalplot(ax,x,v,lo,hi,c=BLUE,label=None):
+ ax.fill_between(x,lo,hi,color=c,alpha=.13,lw=0);ax.plot(x,v,'o-',color=c,ms=3,label=label)
+
+# 2. Every ROC curve is empirical and uses the same restricted population.
+CURRENT='2';f,a=layout('2','Local composition predicts regional organization',[['A','B'],['C','D'],['E','E']],9.6,[.82,1.1,1.9])
+for k,t in zip('ABCDE',['Prediction in the restricted stratum','Composition at clustered acceptors','Performance across the same proteins','Added composition: definition sensitivity','Held-out predictions along individual proteins']):label(a[k],k,t)
+t=csv('regional_code/held_out_tiles');m=t[(t.disorder>=t.disorder.median())&(t.st_fraction>=t.st_fraction.median())]
+for col,c,name in [('full',INK,'Full'),('composition',BLUE,'Composition'),('geometry',GOLD,'Geometry')]:
+ fp,tp,auc=roc(m.label,m[col+'_score']);a['A'].plot(fp,tp,c=c,label=f'{name}  {auc:.3f}');VERIFIED['restricted_'+col]=auc
+assert np.isclose(VERIFIED['restricted_composition'],js('regional_code')['tiles']['matched']['composition_auroc'])
+a['A'].plot([0,1],[0,1],c=GREY,lw=.8,ls='--');a['A'].set(xlabel='False-positive rate',ylabel='True-positive rate',xlim=(0,1),ylim=(0,1.02));a['A'].legend(frameon=False,loc='lower right');a['A'].text(.03,.96,f'n = {len(m):,} tiles',transform=a['A'].transAxes,va='top',fontsize=7)
+c=csv('regional_code/acceptor_model');forest(a['B'],[{'acidic':'Acidic (D + E)','alanine':'Alanine','aromatic':'Aromatic (F + W + Y)'}.get(x,x)for x in c.outcome],c.coefficient.to_list(),c.ci_low.to_list(),c.ci_high.to_list());null(a['B'],0,axis='x');a['B'].set_xlabel('Clustered-versus-isolated coefficient')
+w=csv('regional_code/per_protein')
+# Recompute descriptive per-protein AUROCs from fixed out-of-fold scores.
+rows=[]
+for accession,g in t.groupby('accession',sort=True):
+ if g.label.nunique()!=2:continue
+ rows.append({'accession':accession,**{model:roc(g.label,g[model+'_score'])[2] for model in ['composition','covariates','full']}})
+aucs=pd.DataFrame(rows).set_index('accession')
+expected=w.set_index('accession')
+assert aucs.index.equals(expected.index)
+assert np.allclose(aucs.composition,expected.composition_within_protein_auroc,atol=1e-13,rtol=0)
+assert np.allclose(aucs.full,expected.within_protein_auroc,atol=1e-13,rtol=0)
+assert len(aucs)==454
+aucs.to_csv(O/'Figure_2C_per_protein_AUROC.csv')
+for model,color,name in [('composition',BLUE,'Composition'),('covariates',GOLD,'Disorder + S/T'),('full',TEAL,'Full')]:
+ values=np.sort(aucs[model]);a['C'].step(np.r_[0,values,1],np.r_[0,np.arange(1,len(values)+1)/len(values),1],where='post',color=color,label=f'{name}  {values.mean():.3f}')
+a['C'].set(xlim=(0,1),ylim=(0,1),xlabel='Within-protein AUROC',ylabel='Cumulative fraction of proteins')
+null(a['C'],.5,axis='x');a['C'].legend(frameon=False,loc='upper left',fontsize=6.3,title='Model / mean AUROC',title_fontsize=6.3,handlelength=1.4)
+a['C'].text(.03,.08,'Same 454 proteins',ha='left',fontsize=6.5,transform=a['C'].transAxes)
+# Use the archived nested-model comparison, not full-minus-baseline, to isolate composition.
+sens=csv('region_definition_sensitivity/model_grid');sens=sens[sens.minimum_sites==3].sort_values('core_gap');primary=sens[sens.is_primary].iloc[0]
+assert np.isclose(primary.covariates_within_protein_auroc,aucs.covariates.mean())
+assert np.isclose(primary.composition_within_protein_auroc,aucs.composition.mean())
+colors=[CORAL if row.is_primary else GREY for row in sens.itertuples()]
+labels=[f'Gap {int(row.core_gap)} · n={int(row.within_protein_count)}' for row in sens.itertuples()]
+forest(a['D'],labels,sens.adjusted_composition_increment.to_list(),sens.adjusted_composition_increment_ci_low.to_list(),sens.adjusted_composition_increment_ci_high.to_list(),colors)
+null(a['D'],0,axis='x');a['D'].set(xlim=(-.004,.03),xlabel='Paired mean AUROC gain (95% CI)')
+a['D'].set_xticks([0,.01,.02,.03],['0','+.01','+.02','+.03'])
+a['D'].tick_params(axis='y',labelsize=6.5)
+a['D'].text(.98,.01,f'Primary: +{primary.adjusted_composition_increment:.3f}',color=CORAL,ha='right',fontsize=6.5,transform=a['D'].transAxes)
+sens.to_csv(O/'Figure_2D_composition_increment.csv',index=False)
+VERIFIED['composition_only_mean']=float(aucs.composition.mean())
+VERIFIED['covariates_mean']=float(aucs.covariates.mean())
+VERIFIED['adjusted_composition_increment']=float(primary.adjusted_composition_increment)
+# Show reproducible examples across the observed AUROC distribution.
+counts=csv('consensus_regions/consensus_regions').groupby('accession').size()
+pool=w[w.accession.isin(counts[counts>=5].index)].sort_values('composition_within_protein_auroc')
+chosen=pool.iloc[np.linspace(0,len(pool)-1,8).round().astype(int)].copy()
+chosen.to_csv(O/'Figure_2E_selected_proteins.csv',index=False)
+ax=a['E'];ax.grid(False)
+palette=LinearSegmentedColormap.from_list('scores',['#f1f6f8',BLUE,'#154968'])
+stmap=LinearSegmentedColormap.from_list('st',['#f8f6ef',GOLD])
+idmap=LinearSegmentedColormap.from_list('idr',['#f4f7f5',TEAL])
+gene_map=csv('fg_nup_recovery/proteins').set_index('accession').gene.to_dict()
+labels=[]
+for row,record in enumerate(chosen.itertuples()):
+ z=t[t.accession==record.accession].sort_values('center');centers=z.center.to_numpy();bounds=np.r_[centers[0]-5,(centers[:-1]+centers[1:])/2,centers[-1]+5];bounds=(bounds-bounds[0])/(bounds[-1]-bounds[0])*100
+ y=row*1.28
+ for offset,col,cmap in [(0,'composition_score',palette),(.27,'st_fraction',stmap),(.54,'disorder',idmap)]:
+  ax.pcolormesh(bounds,[y+offset,y+offset+.22],z[col].to_numpy()[None,:],cmap=cmap,vmin=0,vmax=1,rasterized=False)
+ for ii in np.flatnonzero(z.label.to_numpy()):ax.plot(bounds[ii:ii+2],[y-.10,y-.10],c=CORAL,lw=2,solid_capstyle='butt')
+ labels.append(f'{gene_map.get(record.accession,record.accession)}  {record.composition_within_protein_auroc:.2f}')
+ax.set_yticks(np.arange(len(chosen))*1.28+.3,labels,fontsize=6.7)
+ax.set(xlim=(0,100),ylim=(len(chosen)*1.28-.25,-.6),xlabel='Position within the assayed tile span (%)')
+ax.text(0,1.005,'Protein / AUROC',transform=ax.transAxes,fontsize=6.2)
+ax.text(.32,1.005,'Per protein: prediction / S/T fraction / disorder',transform=ax.transAxes,fontsize=6.2)
+ax.plot([],[],c=CORAL,lw=2,label='Observed positive tile');ax.legend(frameon=False,loc='upper right',bbox_to_anchor=(1,1.12),fontsize=6)
+for x,cmap,name in [(.12,palette,'Prediction'),(.42,stmap,'S/T fraction'),(.72,idmap,'Disorder')]:
+ pos=ax.get_position();cbax=f.add_axes([x,pos.y0-.060,.20,.008]);grad=np.linspace(0,1,256)[None,:]
+ cbax.pcolormesh(np.linspace(0,1,257),[0,1],grad,cmap=cmap,vmin=0,vmax=1);cbax.set_yticks([]);cbax.set_xticks([0,1]);cbax.tick_params(labelsize=5.5,length=2);cbax.set_title(name,fontsize=6,pad=2)
+
+finish(f,'2','A: Tiles above median disorder and S/T; restriction, not exact matching. C: 454 informative proteins, equally weighted; full includes composition, geometry and covariates. D: Adding composition to covariates; minimum 3 sites, final gap 10. Cohorts vary by core gap; archived paired protein-bootstrap 95% CIs. Coral: primary definition. E: Existing examples, normalized assayed spans. No model refitting.')
+# 4. Effect sizes and uncertainty rather than decorative distributions.
+CURRENT='4';f,a=layout('4','Local opportunity accounts for much of the PTM overlap',[['A','B'],['C','D'],['E','F']],9)
+for k,t in zip('ABCDEF',['Protein-level clustering distributions','Proline around the acceptor','Paired kinase shifts across proteins','Same-site overlap: primary local control','Progressively conditioned nulls','Distance after covariate matching']):label(a[k],k,t)
+summary=csv('self_clustering/summary');summary=summary[(summary.universe=='all_eligible_residues')&(summary.radius==10)].set_index('ptm')
+per=csv('self_clustering/per_protein');per=per[(per.universe=='all_eligible_residues')&(per.radius==10)]
+order=['oglcnac','phospho','acetylation','ubiquitination'];names=['O-GlcNAc','Phosphorylation','Acetylation (K)','Ubiquitination (K)'];colors=[BLUE,GREY,GOLD,PURPLE]
+ax=a['A'];positions=np.arange(4)[::-1];groups=[per.loc[per.ptm==ptm,'effect'].to_numpy() for ptm in order]
+for ptm,values in zip(order,groups):
+ assert len(values)==int(summary.loc[ptm,'n_proteins'])
+ assert np.isclose(values.mean(),summary.loc[ptm,'mean_effect'],atol=1e-13)
+boxes=ax.boxplot(groups,positions=positions,vert=False,widths=.46,patch_artist=True,manage_ticks=False,showfliers=True,flierprops={'marker':'.','markersize':1.5,'alpha':.35,'markeredgewidth':0,'markerfacecolor':GREY},medianprops={'color':INK,'linewidth':1},boxprops={'linewidth':.7},whiskerprops={'linewidth':.6},capprops={'linewidth':.6})
+for box,color in zip(boxes['boxes'],colors):box.set_facecolor(color);box.set_alpha(.35)
+ax.set_yticks(positions,[f'{name}\nn={len(v):,}' for name,v in zip(names,groups)],fontsize=6.5)
+ax.set(ylim=(-.65,3.65),xlim=(-.5,1.03),xlabel='Observed − expected close-pair fraction')
+ax.set_xticks([-.5,0,.5,1]);ax.grid(False);ax.grid(axis='x',color='#edf0f2');null(ax,0,axis='x')
+per.to_csv(O/'Figure_4A_protein_clustering.csv',index=False)
+p=csv('regional_code/proline_profiles');cols=[f'offset_{v:+d}'for v in range(-5,6)]
+for name,g in p.groupby('set'):
+ a['B'].plot(range(-5,6),g[cols].mean(),'o-',c={'cluster':BLUE,'oglcnac':TEAL,'phospho':CORAL}[name],label={'cluster':'Clustered O-GlcNAc','oglcnac':'All O-GlcNAc','phospho':'Phosphorylation'}[name])
+a['B'].set(xlabel='Offset from acceptor (residues)',ylabel='Mean proline occupancy',ylim=(0,.23));a['B'].legend(frameon=False)
+k=csv('yin_yang/kinase_summary');ks=js('yin_yang')['kinome'];d=k.delta_n90.to_numpy()
+assert len(d)==ks['n_proteins']==465
+assert np.allclose(d,k.cluster_n90-k.control_n90)
+assert np.isclose(d.mean(),ks['delta_n90'],atol=1e-13)
+ax=a['C'];bins=np.arange(5*np.floor(d.min()/5),5*np.ceil(d.max()/5)+5,5)
+counts,edges,bars=ax.hist(d,bins=bins,edgecolor='white',linewidth=.4)
+assert int(counts.sum())==465
+for bar,center in zip(bars,(edges[:-1]+edges[1:])/2):bar.set_facecolor(BLUE if center<0 else CORAL)
+ax.axvspan(*ks['delta_n90_ci'],color=TEAL,alpha=.15,zorder=0);ax.axvline(d.mean(),color=TEAL,lw=1.2);null(ax,0,axis='x')
+ax.set(xlabel='Paired shift: cluster − control',ylabel='Proteins',xlim=(edges[0],edges[-1]),ylim=(0,counts.max()*1.32))
+ax.text(.03,.97,f'Mean {d.mean():.2f}; 95% CI [{ks["delta_n90_ci"][0]:.2f}, {ks["delta_n90_ci"][1]:.2f}]\n{(d<0).sum()}/{len(d)} proteins shift lower',transform=ax.transAxes,fontsize=6.2,va='top',bbox={'facecolor':'white','edgecolor':'none','pad':1})
+k.to_csv(O/'Figure_4C_paired_protein_shifts.csv',index=False)
+VERIFIED['kinase_mean_paired_shift']=float(d.mean())
+
+y=js('yin_yang');keys=['all_w25_all_st','all_w25_residue_matched','regional_w25_all_st','regional_w25_residue_matched'];items=[y['local_opportunity'][k]for k in keys];forest(a['D'],['All / any S/T','All / same residue','Regional / any S/T','Regional / same residue'],[v['ratio']for v in items],[v['ci'][0]for v in items],[v['ci'][1]for v in items],[GREY,BLUE,GREY,TEAL]);null(a['D'],axis='x');a['D'].set(xlabel='Observed / expected (±25 residues)',xlim=(.82,1.12))
+for arm,c,m in [('all',CORAL,'o'),('regional',BLUE,'s')]:
+ items=[y['nested_nulls'][arm][key]for key in ['N0_length','N1_st','N2_disorder']];v=np.array([z['ratio']for z in items]);a['E'].errorbar(range(3),v,yerr=[v-[z['ci'][0]for z in items],[z['ci'][1]for z in items]-v],fmt=m+'-',c=c,capsize=3,label=arm.capitalize())
+a['E'].set_xticks(range(3),['Length','+ S/T','+ Disorder']);a['E'].set(yscale='log',ylabel='Same-site overlap\nobserved / expected',ylim=(.7,10));null(a['E']);a['E'].legend(frameon=False)
+d=csv('regional_code/distance_profile');a['F'].fill_between(d.radius,d.ci_low,d.ci_high,color=BLUE,alpha=.14,lw=0);a['F'].plot(d.radius,d.difference,c=BLUE);null(a['F'],0);a['F'].set(xlabel='Distance to region (residues)',ylabel='Phosphosite − control\nCDF difference')
+finish(f,'4','A: Protein-level observed-minus-expected close-pair fractions at radius 10; boxes show median/IQR, whiskers 1.5 IQR, dots outliers. Cohorts differ; K-based modifications use different eligible residues. C: All 465 paired protein shifts in high-scoring kinase count; teal marks archived mean and 95% CI. D: Primary local controls; all 12 remain in S2. Static co-occurrence does not establish competition.')
+# 5. Catalogue case study and scanner performance; context receives a small inset.
+CURRENT='5';f,a=layout('5','Regional features improve sequence-based recovery',[['A','A'],['B','C'],['D','D']],8.5,[1.15,1,1])
+for k,t in zip('ABCD',['FG nucleoporins: 8 of 10 contain regions','Paired held-out performance','Full held-out precision–recall curves','Region recovery versus calling burden']):label(a[k],k,t)
+g=js('fg_nup_recovery');prot=csv('fg_nup_recovery/proteins');nups=prot[prot.is_fg_nup].sort_values(['has_region','gene'],ascending=[False,True]);assert nups.has_region.sum()==g['n_recovered'];assert len(nups)==g['n_present']
+reg=csv('consensus_regions/consensus_regions');ax=a['A'];ax.grid(False)
+pos=ax.get_position();ax.set_position([.16,pos.y0,.62,pos.height])
+records=[];intervals=[]
+for y,row in enumerate(nups.itertuples()):
+ regions=reg[reg.accession==row.accession].sort_values('start')
+ assert bool(len(regions))==bool(row.has_region)
+ ax.plot([0,100],[y,y],c=LIGHT,lw=4.5,solid_capstyle='butt',zorder=1)
+ for rr in regions.itertuples():
+  assert 1<=rr.start<=rr.end<=row.length
+  lo=100*(rr.start-1)/row.length;hi=100*rr.end/row.length
+  assert 0<=lo<hi<=100
+  ax.plot([lo,hi],[y,y],c=TEAL,lw=4.5,solid_capstyle='butt',zorder=2)
+  intervals.append({'accession':row.accession,'gene':row.gene,'region_id':rr.region_id,'start':rr.start,'end':rr.end,'protein_length':row.length,'start_percent':lo,'end_percent':hi})
+ records.append({'accession':row.accession,'gene':row.gene,'protein_length':row.length,'region_count':len(regions),'has_region':bool(row.has_region)})
+ for x,value in [(1.085,str(len(regions))),(1.245,f'{row.length:,}')]:
+  ax.text(x,y,value,transform=ax.get_yaxis_transform(),ha='center',va='center',fontsize=7,color=INK if len(regions) else GREY)
+ax.text(1.085,-.9,'Regions',transform=ax.get_yaxis_transform(),ha='center',va='center',fontsize=6.5)
+ax.text(1.245,-.9,'Length (aa)',transform=ax.get_yaxis_transform(),ha='center',va='center',fontsize=6.5)
+ax.plot([0,7],[-.9,-.9],c=TEAL,lw=4.5,solid_capstyle='butt')
+ax.text(9,-.9,'Observed consensus regions',va='center',fontsize=6.5,color=TEAL)
+ax.axhline(7.5,c=LIGHT,lw=.7,xmin=0,xmax=1)
+ax.set_yticks(range(len(nups)),nups.gene,fontsize=7)
+ax.set(xlim=(0,100),ylim=(len(nups)-.4,-1.55),xlabel='Position along each protein (% of length)')
+ax.set_xticks([0,25,50,75,100]);ax.tick_params(axis='y',length=0,pad=6)
+ax.spines[['left','top','right']].set_visible(False)
+pd.DataFrame(records).to_csv(O/'Figure_5A_protein_tracks.csv',index=False)
+pd.DataFrame(intervals).to_csv(O/'Figure_5A_region_coordinates.csv',index=False)
+assert len(records)==10 and sum(r['has_region'] for r in records)==8
+assert sum(r['region_count'] for r in records)==len(intervals)
+
+k=csv('scanner/outer_folds')
+for i,row in k.iterrows():
+ a['B'].plot([row.baseline_average_precision,row.enhanced_average_precision],[i,i],c=LIGHT,lw=3);a['B'].scatter(row.baseline_average_precision,i,facecolors='white',edgecolors=GREY,s=29,zorder=3);a['B'].scatter(row.enhanced_average_precision,i,c=TEAL,s=29,zorder=3)
+a['B'].set_yticks(range(len(k)),[f'Fold {i+1}'for i in range(len(k))]);a['B'].set_xlabel('Average precision');a['B'].scatter([],[],facecolors='white',edgecolors=GREY,label='Legacy');a['B'].scatter([],[],c=TEAL,label='Enhanced');a['B'].set_ylim(-.6,5.4);a['B'].legend(frameon=False,ncol=2,loc='upper right',fontsize=6.5)
+pred=csv('scanner/outer_predictions');ss=js('scanner')
+assert len(pred)==ss['cohort']['tiles']==314040
+assert pred.label.sum()==ss['cohort']['positive_tiles']==3196
+assert pred.accession.nunique()==ss['cohort']['proteins']==3535
+assert pred.groupby('accession').fold.nunique().max()==1
+# Tie-aware complete precision-recall curves from fixed outer-fold scores.
+def precision_recall(y,score):
+ y=np.asarray(y,dtype=int);score=np.asarray(score);assert set(np.unique(y))=={0,1};assert np.isfinite(score).all()
+ order=np.argsort(-score,kind='stable');yy=y[order];vv=score[order]
+ ends=np.r_[np.flatnonzero(np.diff(vv)),len(vv)-1];tp=np.cumsum(yy)[ends]
+ recall=tp/yy.sum();precision=tp/(ends+1)
+ ap=float(np.sum(np.diff(np.r_[0,recall])*precision))
+ return np.r_[0,recall],np.r_[1,precision],ap
+assert precision_recall([0,1],[.5,.5])[2]==.5
+assert precision_recall([0,1],[0,1])[2]==1
+assert precision_recall([0,1],[1,0])[2]==.5
+for model,color,name in [('baseline',GREY,'Legacy'),('enhanced',TEAL,'Enhanced')]:
+ recall,precision,ap=precision_recall(pred.label,pred[model+'_score'])
+ assert np.isclose(ap,ss[model]['average_precision'],atol=1e-13,rtol=0)
+ a['C'].step(recall,precision,where='pre',color=color,lw=1,label=f'{name}: AP {ap:.3f}')
+ pd.DataFrame({'recall':recall,'precision':precision}).to_csv(O/f'Figure_5C_{model}_precision_recall.csv',index=False)
+ VERIFIED['scanner_'+model+'_AP']=ap
+ # Independently reconcile each fold's reported AP with raw held-out scores.
+ for row in k.itertuples():
+  z=pred[pred.fold==row.fold];assert np.isclose(precision_recall(z.label,z[model+'_score'])[2],getattr(row,model+'_average_precision'),atol=1e-13,rtol=0)
+prevalence=float(pred.label.mean());a['C'].axhline(prevalence,color=GOLD,lw=.9,ls='--',label=f'Prevalence {prevalence:.2%}')
+a['C'].set(xlabel='Held-out tile recall',ylabel='Catalogue precision',xlim=(0,1),ylim=(0,1));a['C'].legend(frameon=False,loc='upper right',fontsize=6)
+op=csv('scanner/operating_points');op=op[op.model.isin(['baseline','enhanced'])]
+assert np.allclose(op.region_recall,op.region_hit/op.region_total)
+for model,color,marker,name in [('baseline',GREY,'o','Legacy'),('enhanced',TEAL,'s','Enhanced')]:
+ z=op[op.model==model].sort_values('n_predicted');a['D'].plot(z.n_predicted,z.region_hit,marker+'-',c=color,label=name,ms=4)
+ for row in z.itertuples():
+  a['D'].annotate(f'{row.region_hit}',(row.n_predicted,row.region_hit),xytext=(0,7 if model=='enhanced' else -12),textcoords='offset points',fontsize=6,ha='center',color=color)
+for q,g in op.groupby('negative_quantile'):
+ g=g.set_index('model');a['D'].plot(g.loc[['baseline','enhanced'],'n_predicted'],g.loc[['baseline','enhanced'],'region_hit'],color=LIGHT,lw=.8,zorder=0)
+a['D'].set(xlabel='Tiles called at training-calibrated thresholds (log scale)',ylabel='Catalogue regions recovered',xscale='log',xlim=(1800,42000),ylim=(0,824))
+a['D'].set_xticks([2000,5000,10000,20000,40000],['2,000','5,000','10,000','20,000','40,000']);a['D'].minorticks_off()
+a['D'].set_yticks([0,200,400,600,824]);a['D'].legend(frameon=False,loc='upper left',fontsize=6.5)
+a['D'].text(.98,.04,'All 5 calibration settings per model; 824 regions total',ha='right',transform=a['D'].transAxes,fontsize=6.5)
+op.to_csv(O/'Figure_5D_region_recovery.csv',index=False)
+finish(f,'5','A: Each protein is normalized to its own length; exact region coordinates and lengths are retained. Catalogue case study, not prospective validation (background 13.5%; matched P = 0.00414). B/C: 314,040 outer-held-out tiles, 3,535 proteins, 3,196 positives. C: Complete curves; dashed line is prevalence. D: All five calibrated settings; connectors pair calibration settings, not equal budgets. Overlapping calls are not independent experiments; catalogue labels are incomplete.')
+CURRENT='S2';f,a=layout('S2','Kinase preferences and local co-occurrence sensitivity',[['A','A'],['B','B'],['C','C']],9.5,[.8,.8,1.35])
+for ax in a.values():
+ pos=ax.get_position();ax.set_position([.31,pos.y0,.665,pos.height])
+for k,t in zip('ABC',['Kinase-level shifts','Kinase-level distributions within families','All local-window and matching configurations']):label(a[k],k,t)
+k=csv('yin_yang/kinase_site_scores').sort_values('delta');a['A'].bar(np.arange(len(k)),k.delta,color=[CORAL if x>0 else BLUE for x in k.delta],width=1,lw=0);null(a['A'],0);a['A'].set(xlabel=f'Kinases ranked by shift (n = {len(k)})',ylabel='Cluster − control percentile')
+fam=k.groupby('family').delta.mean().sort_values();rng=np.random.default_rng(20261011);ax=a['B']
+for j,family in enumerate(fam.index):
+ values=k.loc[k.family==family,'delta'].to_numpy();y=len(fam)-1-j
+ ax.scatter(values,y+rng.uniform(-.18,.18,len(values)),s=9,alpha=.50,color=BLUE if values.mean()<0 else CORAL,lw=0,zorder=3)
+ if len(values)>1:
+  low,high=np.quantile(values,[.25,.75]);ax.plot([low,high],[y,y],color=INK,lw=2,zorder=4)
+ ax.plot(values.mean(),y,marker='|',color=CORAL,ms=7,mew=1.2,zorder=5)
+ax.set_yticks(np.arange(len(fam))[::-1],[f'{name} (n={int((k.family==name).sum())})' for name in fam.index],fontsize=6.5)
+ax.set(ylim=(-.65,len(fam)-.35),xlabel='Kinase mean percentile shift: cluster − control')
+ax.grid(False);ax.grid(axis='x',color='#edf0f2');null(ax,0,axis='x')
+ax.text(.99,1.015,'Points: kinases   |   dark: IQR   |   coral: mean',transform=ax.transAxes,ha='right',fontsize=6)
+k.to_csv(O/'Figure_S2B_kinase_distributions.csv',index=False)
+assert k.groupby('family').size().sum()==309
+y=js('yin_yang')['local_opportunity'];keys=sorted(y,key=lambda s:(s.startswith('regional'),int(s.split('_w')[1].split('_')[0]),s.endswith('residue_matched')));items=[y[k]for k in keys];names=[f"{'Regional' if k.startswith('regional') else 'All sites'} · ±{k.split('_w')[1].split('_')[0]} · {'same residue' if k.endswith('residue_matched') else 'any S/T'}"for k in keys];forest(a['C'],names,[v['ratio']for v in items],[v['ci'][0]for v in items],[v['ci'][1]for v in items],[TEAL if k.startswith('regional')else BLUE for k in keys]);null(a['C'],axis='x');a['C'].set(xlabel='Observed / expected same-site co-occurrence (95% CI)',xlim=(.82,1.14));a['C'].tick_params(axis='y',labelsize=7); pos=a['C'].get_position()
+finish(f,'S2','A: Each ranked bar is a kinase mean shift over archived site pairs. B: All 309 kinases, grouped by family; counts are kinases, dark spans are interquartile ranges and coral ticks are means. Vertical jitter only separates overlapping points. Single-kinase families have no distribution interval. Kinases share site pairs; points are descriptive, not independent biological replicates. C: All 12 local co-occurrence estimates and their archived intervals; 11 include 1. No family-level significance is inferred.')
+
+for path,digest in USED.items():assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==digest
+(O/'source_manifest.json').write_text(json.dumps({'input_hashes':USED,'outputs':MAN,'verified_metrics':VERIFIED,'no_model_refitting':True},indent=2))
+(O/'layout_geometry.json').write_text(json.dumps({'panels':GEOMETRY,'gutter_checks':GUTTERS,'row_gap_checks':ROW_GAPS},indent=2))
+print('ANALYTICS PILOT COMPLETE',flush=True)

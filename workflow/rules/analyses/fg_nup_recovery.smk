@@ -3,6 +3,7 @@
 
 rule fg_nup_recovery:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
         regions=rules.consensus_regions.output.regions,
     output:

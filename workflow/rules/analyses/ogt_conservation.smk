@@ -3,6 +3,7 @@
 
 rule ogt_conservation:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
     output:
         residues=f"{RESULTS}/analysis/ogt_conservation/residue_conservation.csv",

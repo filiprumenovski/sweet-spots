@@ -20,3 +20,8 @@ inputs
 results/work/
 results/logs/
 results/benchmarks/
+
+# Locally generated reviewer output; distributed with run evidence
+results/review/
+results/audit/PASS
+results/provenance/input_validation.json

@@ -3,6 +3,7 @@
 
 rule input_manifest:
     input:
+        code=CORE_CODE + ["src/regional_code_paper/reporting/input_manifest.py"],
         reference="reference/input_manifest.json",
         fasta_human=f"{SOURCE_ROOT}/data/interim/fasta_human.parquet",
         fasta_all=f"{SOURCE_ROOT}/data/interim/fasta_all.parquet",

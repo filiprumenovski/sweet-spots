@@ -2,6 +2,10 @@
 
 rule audit_report:
     input:
+        code=CORE_CODE + ["src/regional_code_paper/reporting/audit.py",
+              "src/regional_code_paper/reporting/editorial.py",
+              "src/regional_code_paper/reporting/input_manifest.py"],
+        editorial=sorted(str(path) for path in Path("assets/review_figures").rglob("*") if path.is_file()),
         ledger=rules.result_ledger_csv.output,
         parquet=rules.result_ledger_parquet.output,
         manifest=rules.input_manifest.output,
@@ -10,7 +14,7 @@ rule audit_report:
         regional=f"{RESULTS}/analysis/regional_code/held_out_tiles.csv",
         catalogue=f"{RESULTS}/analysis/region_definition_sensitivity/catalogue_grid.csv",
         models=f"{RESULTS}/analysis/region_definition_sensitivity/model_grid.csv",
-        reference=sorted(str(path) for path in __import__("pathlib").Path("reference").glob("*")),
+        reference=sorted(str(path) for path in Path("reference").glob("*")),
     output:
         f"{RESULTS}/audit/reproduction_report.json",
     log:

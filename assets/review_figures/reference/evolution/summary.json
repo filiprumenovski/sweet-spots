@@ -1,0 +1,155 @@
+{
+  "alignments_used": 349,
+  "composition_position_nulls": {
+    "cosine": {
+      "excess": 0.4435714165714956,
+      "excess_ci": [
+        0.3874843403167186,
+        0.5049078095502048
+      ],
+      "null_a": 0.48958157212095577,
+      "true": 0.9331529886924514
+    },
+    "js": {
+      "excess": 0.4166791303397937,
+      "excess_ci": [
+        0.3683143930261574,
+        0.47202446324898384
+      ],
+      "null_a": 0.5167178000077156,
+      "true": 0.9333969303475091
+    },
+    "pearson": {
+      "excess": 0.6270359326641678,
+      "excess_ci": [
+        0.554039370601116,
+        0.7037706952180026
+      ],
+      "null_a": 0.28572281076861356,
+      "true": 0.9127587434327812
+    },
+    "position": {
+      "excess": 0.23405367586061784,
+      "excess_ci": [
+        0.1815295748808998,
+        0.2943485840394471
+      ],
+      "null_a": -0.004363742972232719,
+      "true": 0.2296899328883851
+    }
+  },
+  "site_conservation": [
+    {
+      "divergence_million_years": 90,
+      "exact": 0.7327611719443622,
+      "gap": 0.1296241491565552,
+      "gap_ci": [
+        0.10475280721706828,
+        0.15537336887039094
+      ],
+      "n_proteins": 335,
+      "n_sites": 3379,
+      "regional": 0.8623853211009175,
+      "species": "mouse"
+    },
+    {
+      "divergence_million_years": 90,
+      "exact": 0.8304254667891031,
+      "gap": 0.14906642179369453,
+      "gap_ci": [
+        0.12406457748964689,
+        0.17451948236357182
+      ],
+      "n_proteins": 315,
+      "n_sites": 3267,
+      "regional": 0.9794918885827977,
+      "species": "rat"
+    },
+    {
+      "divergence_million_years": 450,
+      "exact": 0.5070631970260223,
+      "gap": 0.4037174721189591,
+      "gap_ci": [
+        0.36473247927656366,
+        0.43930831480658067
+      ],
+      "n_proteins": 134,
+      "n_sites": 1345,
+      "regional": 0.9107806691449815,
+      "species": "zebrafish"
+    },
+    {
+      "divergence_million_years": 700,
+      "exact": 0.30054151624548736,
+      "gap": 0.4666064981949459,
+      "gap_ci": [
+        0.42999154160345726,
+        0.5152729351870364
+      ],
+      "n_proteins": 70,
+      "n_sites": 1108,
+      "regional": 0.7671480144404332,
+      "species": "fly"
+    },
+    {
+      "divergence_million_years": 700,
+      "exact": 0.2392638036809816,
+      "gap": 0.401840490797546,
+      "gap_ci": [
+        0.31950207468879666,
+        0.48196839249911544
+      ],
+      "n_proteins": 40,
+      "n_sites": 326,
+      "regional": 0.6411042944785276,
+      "species": "worm"
+    }
+  ],
+  "substitution_events": 10788,
+  "transfer": [
+    {
+      "auroc": 0.86438855856583,
+      "ci": [
+        0.8206110711252325,
+        0.9056410610012616
+      ],
+      "direction": "human_to_target",
+      "n_proteins": 32,
+      "n_tiles": 3721,
+      "species": "Arabidopsis"
+    },
+    {
+      "auroc": 0.8617398415002272,
+      "ci": [
+        0.8321298441420133,
+        0.8935284218724225
+      ],
+      "direction": "human_to_target",
+      "n_proteins": 55,
+      "n_tiles": 6619,
+      "species": "mouse"
+    },
+    {
+      "auroc": 0.8065612089584693,
+      "ci": [
+        0.7677481780591642,
+        0.8426008963648411
+      ],
+      "direction": "human_to_target",
+      "n_proteins": 59,
+      "n_tiles": 4807,
+      "species": "rice"
+    },
+    {
+      "auroc": 0.8113448310305266,
+      "ci": [
+        0.7985542598101216,
+        0.8234664753668065
+      ],
+      "direction": "rice_to_human",
+      "n_proteins": 477,
+      "n_tiles": 51612,
+      "species": "human"
+    }
+  ]
+}

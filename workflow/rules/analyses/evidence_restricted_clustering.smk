@@ -3,6 +3,7 @@
 
 rule evidence_restricted_clustering:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
     output:
         proteins=f"{RESULTS}/analysis/evidence_restricted_clustering/per_protein.csv",

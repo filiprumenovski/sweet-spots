@@ -10,9 +10,19 @@ record. Exploratory work is outside this workflow's declared scope.
 
 configfile: "config/config.yaml"
 
+from pathlib import Path
+
 from snakemake.utils import validate
 
 validate(config, "../config/schema.yaml")
+
+# Scientific source changes conservatively invalidate scientific jobs; report edits do not.
+CORE_CODE = sorted(str(path) for path in Path("src/regional_code_paper/core").glob("*.py"))
+CORE_CODE += ["pyproject.toml", "uv.lock", "config/config.yaml"]
+SCIENCE_CODE = CORE_CODE + sorted(
+    str(path) for folder in ("analysis", "execution", "models")
+    for path in (Path("src/regional_code_paper") / folder).glob("*.py")
+)
 
 SOURCE_ROOT = config["source_root"]
 RESULTS = config.get("results_root", "results")
@@ -63,11 +73,13 @@ include: "rules/analyses/fg_nup_recovery.smk"
 include: "rules/products/result_ledger.smk"
 include: "rules/products/figures.smk"
 include: "rules/products/audit.smk"
+include: "rules/products/review.smk"
 
 
 rule all:
     input:
         f"{RESULTS}/audit/PASS",
+        f"{RESULTS}/review/index.html",
         f"{RESULTS}/tables/manuscript_result_ledger.parquet",
         f"{RESULTS}/analysis/region_definition_sensitivity/catalogue_grid.csv",
         f"{RESULTS}/analysis/region_definition_sensitivity/model_grid.csv",

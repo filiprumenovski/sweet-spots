@@ -56,3 +56,12 @@ def test_input_content_and_directory_membership_are_enforced():
     observed["directories"]["human_ortholog_alignments"]["files"] += 1
     with pytest.raises(ValueError, match="directories"):
         verify_manifest(observed, expected)
+
+
+def test_nonfinite_observation_fails_but_report_remains_serializable():
+    expected = pd.DataFrame({"claim_id": ["a"], "value": [0.8]})
+    observed = expected.copy()
+    observed.loc[0, "value"] = float("inf")
+    checks = table_checks(observed, expected, "claim_id")
+    assert not all(item["passed"] for item in checks)
+    json.dumps(checks, allow_nan=False)

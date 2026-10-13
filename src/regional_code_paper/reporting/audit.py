@@ -16,6 +16,13 @@ from .input_manifest import verify_manifest
 FIGURES = [f"Figure_{name}" for name in ("1", "2", "3", "4", "5", "S1", "S2", "S3", "S4")]
 
 
+def json_cell(value):
+    if pd.isna(value):
+        return None
+    value = value.item() if hasattr(value, "item") else value
+    return str(value) if isinstance(value, float) and not math.isfinite(value) else value
+
+
 def table_checks(observed: pd.DataFrame, expected: pd.DataFrame, key: str) -> list[dict]:
     """Compare every cell, rejecting missing/extra/duplicate rows and columns."""
     checks = []
@@ -46,16 +53,8 @@ def table_checks(observed: pd.DataFrame, expected: pd.DataFrame, key: str) -> li
                 {
                     "row": str(identity),
                     "column": column,
-                    "expected": None
-                    if pd.isna(value)
-                    else value.item()
-                    if hasattr(value, "item")
-                    else value,
-                    "observed": None
-                    if pd.isna(actual)
-                    else actual.item()
-                    if hasattr(actual, "item")
-                    else actual,
+                    "expected": json_cell(value),
+                    "observed": json_cell(actual),
                     "passed": bool(passed),
                 }
             )
@@ -65,7 +64,7 @@ def table_checks(observed: pd.DataFrame, expected: pd.DataFrame, key: str) -> li
 def figure_checks(manifest_path: Path, project_root: Path) -> list[dict]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     expected = {
-        f"results/figures/{name}.{extension}"
+        str(manifest_path.parent.relative_to(project_root) / f"{name}.{extension}")
         for name in FIGURES
         for extension in ("pdf", "png")
     }
@@ -93,6 +92,8 @@ def figure_checks(manifest_path: Path, project_root: Path) -> list[dict]:
 
 
 def build_report(project_root: Path, results: Path, reference: Path) -> dict:
+    from .editorial import editorial_checks
+
     checks = {}
     tables = {
         "claims": ("tables/manuscript_result_ledger.csv", "claim_id"),
@@ -128,6 +129,7 @@ def build_report(project_root: Path, results: Path, reference: Path) -> dict:
     except ValueError as error:
         checks["inputs"] = [{"passed": False, "error": str(error)}]
     checks["figures"] = figure_checks(results / "figures/figure_manifest.json", project_root)
+    checks["editorial"] = editorial_checks(project_root, results)
     passed = all(check["passed"] for group in checks.values() for check in group)
     return {
         "status": "reproduced" if passed else "failed",

@@ -5,6 +5,7 @@ REGIONAL_PREP = f"{RESULTS}/work/regional_code/prepared"
 
 rule regional_code_prepare:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
         regions=rules.consensus_regions.output.regions,
         sites=rules.consensus_regions.output.sites,
@@ -32,6 +33,7 @@ rule regional_code_prepare:
 
 rule regional_code_fold:
     input:
+        code=SCIENCE_CODE,
         validation="src/regional_code_paper/core/validation_folds.json",
         cache=rules.regional_code_prepare.output.cache,
     output:
@@ -60,6 +62,7 @@ rule regional_code_fold:
 
 rule regional_code:
     input:
+        code=SCIENCE_CODE,
         prepared=rules.regional_code_prepare.output,
         folds=expand(f"{RESULTS}/work/regional_code/folds/fold_{{fold}}.csv", fold=OUTER_FOLDS),
         fold_receipts=expand(f"{RESULTS}/work/regional_code/folds/fold_{{fold}}.receipt.json", fold=OUTER_FOLDS),
