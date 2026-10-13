@@ -32,6 +32,7 @@ rule regional_code_prepare:
 
 rule regional_code_fold:
     input:
+        validation="src/regional_code_paper/core/validation_folds.json",
         cache=rules.regional_code_prepare.output.cache,
     output:
         data=f"{RESULTS}/work/regional_code/folds/fold_{{fold}}.csv",

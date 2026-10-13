@@ -47,7 +47,12 @@ performed only after this validation.
 ## Numerical determinism
 
 Histogram-boosting jobs use one numerical thread. Parallelism is across folds,
-which avoids OpenMP reduction-order drift. Lossless NumPy bundles carry model
+which avoids OpenMP reduction-order drift. Protein-grouped train/test memberships
+are frozen explicitly, including nested scanner folds, so CPU-dependent sorting
+of equal-sized groups cannot change the experiment. The splitter rejects changed
+cohorts. See [portable reproduction](portable_reproduction.md).
+
+Lossless NumPy bundles carry model
 features between preparation and fit stages; CSV remains the human-review
 boundary for final tables. Kinase percentiles are reduced in original global
 pair order, so changing the number of scheduling shards does not change sums.

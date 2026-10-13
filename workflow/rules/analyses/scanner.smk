@@ -26,6 +26,7 @@ rule scanner_prepare:
 
 rule scanner_fold:
     input:
+        validation="src/regional_code_paper/core/validation_folds.json",
         cache=rules.scanner_prepare.output.cache,
         metadata=rules.scanner_prepare.output.metadata,
     output:

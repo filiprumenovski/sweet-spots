@@ -173,6 +173,76 @@
     },
     {
       "absolute_error": 0.0,
+      "claim_id": "regional_code.composition.auroc",
+      "expected": 0.8219988722110085,
+      "observed": 0.8219988722110085,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "regional_code.composition_matched.auroc",
+      "expected": 0.7453894398885004,
+      "observed": 0.7453894398885004,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "regional_code.geometry.auroc",
+      "expected": 0.8424823603127468,
+      "observed": 0.8424823603127468,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "regional_code.geometry_matched.auroc",
+      "expected": 0.7203301978349169,
+      "observed": 0.7203301978349169,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
+      "claim_id": "scanner.baseline.auroc",
+      "expected": 0.916824448633845,
+      "observed": 0.916824448633845,
+      "passed": true
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "claim_id": "scanner.baseline.average_precision",
+      "expected": 0.19096755406455435,
+      "observed": 0.1909675540645543,
+      "passed": true
+    },
+    {
+      "absolute_error": 1.1102230246251565e-16,
+      "claim_id": "scanner.enhanced.auroc",
+      "expected": 0.9296916915485249,
+      "observed": 0.9296916915485248,
+      "passed": true
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "claim_id": "scanner.enhanced.average_precision",
+      "expected": 0.21863497621947386,
+      "observed": 0.2186349762194738,
+      "passed": true
+    },
+    {
+      "absolute_error": 1.1102230246251565e-16,
+      "claim_id": "scanner.selected.auroc",
+      "expected": 0.9296916915485249,
+      "observed": 0.9296916915485248,
+      "passed": true
+    },
+    {
+      "absolute_error": 5.551115123125783e-17,
+      "claim_id": "scanner.selected.average_precision",
+      "expected": 0.21863497621947386,
+      "observed": 0.2186349762194738,
+      "passed": true
+    },
+    {
+      "absolute_error": 0.0,
       "claim_id": "kinome.delta_n90",
       "expected": -5.291756173032191,
       "observed": -5.291756173032191,

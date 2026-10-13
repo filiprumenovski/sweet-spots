@@ -24,6 +24,7 @@ rule region_definition_catalogue_sensitivity:
 
 rule region_definition_model_sensitivity:
     input:
+        validation="src/regional_code_paper/core/validation_folds.json",
         manifest=rules.input_manifest.output,
         primary=rules.consensus_regions.output.regions,
     output:

@@ -34,10 +34,10 @@ substitutes a newer database release.
 
 ## User-supplied inputs
 
-These files are part of the exact scientific contract but not the public
-release:
+These files are part of the exact scientific contract and are excluded from the
+open input bundle. The provider restrictions recorded for them are:
 
-| Required path | Bytes | SHA-256 | Reason not redistributed |
+| Required path | Bytes | SHA-256 | Reason excluded from open bundle |
 |---|---:|---|---|
 | `analysis/revalidation/data/atlas_unambiguous.csv` | 7,444,780 | `7ea5e1351f71605fae0e7556184845dbb10d4b1acb6bb3f44db9024b8fb3f95e` | O-GlcNAcAtlas provides a public bulk download but states no explicit redistribution license. |
 | `data/external/multispecies_oglcnac/rice_sequences.fasta` | 492,827 | `4891f26934f25d69d7e9fa3f85a80197b235068cc27d809bdbecc13d053dfd8d` | MSU/RGAP provides sequence downloads but states no explicit redistribution license. |
@@ -57,6 +57,25 @@ O-GlcNAc records, 230,303 PhosphoSitePlus phosphorylation records, and 62,673
 dbPTM ubiquitination records. Because those records share one analysis-ready
 file, the entire parquet is treated as restricted.
 
+## Supplemental archive
+
+The separately published [supplemental-inputs-v1 release](https://github.com/filiprumenovski/sweet-spots/releases/tag/supplemental-inputs-v1)
+and [Zenodo record 23330269](https://zenodo.org/records/23330269) contain
+`sweet-spots-input-data-v1.zip`, with the three files at their required `inputs/`
+paths. Its SHA-256 is
+`969b169a7be0b06c34ef93f694d0211d5d17c936edbdb5e7d9cf709b4c96d330`.
+The archive's availability does not change the provider terms listed above.
+It is not included by `make inputs`.
+
+After obtaining the archive, verify and extract it from the repository root:
+
+```bash
+printf '%s  %s\n' \
+  969b169a7be0b06c34ef93f694d0211d5d17c936edbdb5e7d9cf709b4c96d330 \
+  sweet-spots-input-data-v1.zip | sha256sum --check
+uv run --frozen python -m zipfile -e sweet-spots-input-data-v1.zip .
+```
+
 ## Verification
 
 After adding the three user-supplied files, verify the complete tree before
@@ -67,4 +86,6 @@ uv run snakemake --snakefile workflow/Snakefile --profile profiles/local \
   results/provenance/input_manifest.json
 ```
 
-The rule fails closed on a missing path or changed file identity.
+The rule fails on missing required files and records their content hashes.
+Compare the generated manifest with the archived identity record to confirm
+exact input versions; generating a manifest alone does not enforce those hashes.

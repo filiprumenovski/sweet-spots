@@ -17,10 +17,10 @@ import pandas as pd
 from sklearn.base import clone
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import average_precision_score, roc_auc_score
-from sklearn.model_selection import GroupKFold
 
 from ..core.config import load_config
 from ..core.io import write_json
+from ..core.validation import protein_group_folds
 from .scanner_features import (
     REDUCED_CLASS,
     REDUCED_PAIRS,
@@ -222,7 +222,7 @@ def baseline_estimator() -> HistGradientBoostingClassifier:
 
 def inner_oof(estimator, matrix, labels, groups) -> np.ndarray:
     predictions = np.full(len(labels), np.nan)
-    for train, validation in GroupKFold(3).split(matrix, labels, groups):
+    for train, validation in protein_group_folds(groups, 3):
         fitted = clone(estimator).fit(matrix[train], labels[train])
         predictions[validation] = fitted.predict_proba(matrix[validation])[:, 1]
     return predictions
@@ -247,7 +247,7 @@ def evaluate_nested(legacy, enhanced, labels, groups):
     }
     fold_rows = []
     for fold_index, (outer_train, outer_test) in enumerate(
-        GroupKFold(5).split(legacy, labels, groups)
+        protein_group_folds(groups)
     ):
         inner_predictions = {}
         inner_ap = {}
@@ -380,11 +380,10 @@ def main() -> None:
             operating_rows.append(row)
             operating_summary[model][str(quantile)] = row
     family_results = {}
-    splitter = GroupKFold(5)
     for family in ("composition", "geometry", "disorder"):
         matrix = enhanced[:, np.asarray(families[family])]
         family_scores = np.full(len(labels), np.nan)
-        for train, test in splitter.split(matrix, labels, groups):
+        for train, test in protein_group_folds(groups):
             fitted = make_region_classifier().fit(matrix[train], labels[train])
             family_scores[test] = fitted.predict_proba(matrix[test])[:, 1]
         family_results[family] = {

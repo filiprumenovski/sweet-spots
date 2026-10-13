@@ -23,7 +23,10 @@ in the [region definition guide](docs/region_definition.md).
 ## Quick start
 
 Requirements are Python 3.12, [uv](https://docs.astral.sh/uv/), and a POSIX
-shell. DuckDB, Snakemake, and all Python dependencies are pinned in `uv.lock`.
+shell on macOS or a modern Linux distribution (glibc 2.28 or newer). The DuckDB
+CLI, Snakemake, and all Python dependencies are pinned in `uv.lock`. Older HPC
+hosts can run the locked environment inside Apptainer; see
+[portable reproduction](docs/portable_reproduction.md).
 
 ```bash
 git clone https://github.com/filiprumenovski/sweet-spots.git
@@ -32,15 +35,15 @@ make install
 make inputs
 ```
 
-`make inputs` downloads and verifies the 127 MB open-data release. Three
-licensed inputs cannot be republished and must be supplied separately. Their
-exact locations, versions, sizes, hashes, and provider links are listed in the
-[input data guide](docs/input_data.md).
+`make inputs` downloads and verifies the 127 MB open-data release. Three additional
+inputs are installed separately. The existing supplemental archive, exact
+locations, hashes, and provider terms are described in the
+[input data guide](docs/input_data.md#supplemental-archive).
 
 Once the complete `inputs/` tree is present:
 
 ```bash
-make validate-inputs  # verify every input digest
+make validate-inputs  # record every input digest
 make dry-run          # inspect the complete execution plan
 make reproduce        # run all analyses, figures, tables, and audits
 ```

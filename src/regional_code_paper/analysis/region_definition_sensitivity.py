@@ -18,11 +18,11 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GroupKFold
 
 from ..core.config import load_config
 from ..core.io import write_csv, write_json
 from ..core.randomness import stable_seed
+from ..core.validation import protein_group_folds
 from .consensus_regions import load_sequences, load_site_evidence, segment_positions
 from .regional_code import COMPOSITION_FEATURES, bootstrap_interval, build_tiles, load_inputs
 
@@ -186,7 +186,7 @@ def held_out_scores(tiles: pd.DataFrame, seed: int) -> pd.DataFrame:
     scored = tiles[["accession", "center", "label", "disorder", "st_fraction"]].copy()
     for model_name, features in MODEL_FEATURES.items():
         scores = np.empty(len(tiles), dtype=float)
-        for train, test in GroupKFold(5).split(tiles, labels, groups):
+        for train, test in protein_group_folds(groups):
             model = HistGradientBoostingClassifier(
                 max_iter=300,
                 max_depth=3,

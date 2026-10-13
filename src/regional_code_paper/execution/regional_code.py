@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GroupKFold
 
 from ..analysis.regional_code import (
     MODEL_FEATURES,
@@ -24,6 +23,7 @@ from ..analysis.regional_code import (
 from ..core.config import load_config
 from ..core.io import write_csv, write_json, write_npz
 from ..core.randomness import stable_seed
+from ..core.validation import protein_group_folds
 from .sharding import Shard, validate_complete_partition, validate_receipts, write_receipt
 
 
@@ -88,7 +88,7 @@ def run_fold(
         groups = data["groups"]
         row_ids = data["row_ids"]
     column_index = {name: index for index, name in enumerate(feature_names)}
-    train, test = list(GroupKFold(5).split(matrix, labels, groups))[fold]
+    train, test = list(protein_group_folds(groups))[fold]
     rows = pd.DataFrame({"row_id": row_ids[test], "fold": fold})
     for name, columns in MODEL_FEATURES.items():
         selected = [column_index[column] for column in columns]
