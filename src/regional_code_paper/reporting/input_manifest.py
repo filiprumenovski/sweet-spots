@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import platform
 from pathlib import Path
 
@@ -108,12 +109,36 @@ def build_manifest(config_path: Path) -> dict[str, object]:
     }
 
 
+def verify_manifest(observed: dict, expected: dict) -> None:
+    """Require exact content and membership; runtime versions are provenance only."""
+    changed = [
+        section
+        for section in ("files", "directories")
+        if observed.get(section) != expected.get(section)
+    ]
+    if changed:
+        raise ValueError("Frozen input identity mismatch: " + ", ".join(changed))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    write_json(args.output, build_manifest(args.config))
+    try:
+        manifest = build_manifest(args.config)
+        reference = load_config(args.config).project_root / "reference/input_manifest.json"
+        verify_manifest(manifest, json.loads(reference.read_text(encoding="utf-8")))
+    except (OSError, ValueError) as error:
+        write_json(
+            args.output.with_name("input_validation.json"),
+            {"passed": False, "error": str(error)},
+        )
+        raise
+    write_json(args.output.with_name("input_validation.json"), {"passed": True})
+    # An unchanged preflight must not invalidate every downstream analysis.
+    if not args.output.exists() or json.loads(args.output.read_text()) != manifest:
+        write_json(args.output, manifest)
 
 
 if __name__ == "__main__":

@@ -67,7 +67,7 @@ include: "rules/products/audit.smk"
 
 rule all:
     input:
-        f"{RESULTS}/audit/reproduction_report.json",
+        f"{RESULTS}/audit/PASS",
         f"{RESULTS}/tables/manuscript_result_ledger.parquet",
         f"{RESULTS}/analysis/region_definition_sensitivity/catalogue_grid.csv",
         f"{RESULTS}/analysis/region_definition_sensitivity/model_grid.csv",
