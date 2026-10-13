@@ -16,12 +16,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
 
 from ..core.config import load_config
 from ..core.randomness import stable_seed
 from ..core.validation import protein_group_folds
+from ..models.regional import regional_estimator
 
 COMPOSITION_FEATURES = (
     "acidic",
@@ -222,13 +222,7 @@ def grouped_predictions(tiles: pd.DataFrame, seed: int) -> dict[str, np.ndarray]
     for name, columns in MODEL_FEATURES.items():
         scores = np.zeros(len(tiles), dtype=float)
         for train, test in protein_group_folds(groups):
-            model = HistGradientBoostingClassifier(
-                max_iter=300,
-                max_depth=3,
-                learning_rate=0.04,
-                l2_regularization=1.0,
-                random_state=seed,
-            )
+            model = regional_estimator(seed)
             model.fit(tiles.iloc[train][list(columns)], labels[train])
             scores[test] = model.predict_proba(tiles.iloc[test][list(columns)])[:, 1]
         output[name] = scores

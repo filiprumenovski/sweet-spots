@@ -7,7 +7,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
 
 from ..analysis.regional_code import (
@@ -24,6 +23,7 @@ from ..core.config import load_config
 from ..core.io import write_csv, write_json, write_npz
 from ..core.randomness import stable_seed
 from ..core.validation import protein_group_folds
+from ..models.regional import regional_estimator
 from .sharding import Shard, validate_complete_partition, validate_receipts, write_receipt
 
 
@@ -92,13 +92,7 @@ def run_fold(
     rows = pd.DataFrame({"row_id": row_ids[test], "fold": fold})
     for name, columns in MODEL_FEATURES.items():
         selected = [column_index[column] for column in columns]
-        model = HistGradientBoostingClassifier(
-            max_iter=300,
-            max_depth=3,
-            learning_rate=0.04,
-            l2_regularization=1.0,
-            random_state=seed,
-        )
+        model = regional_estimator(seed)
         model.fit(matrix[train][:, selected], labels[train])
         rows[f"{name}_score"] = model.predict_proba(matrix[test][:, selected])[:, 1]
     rows = rows.sort_values("row_id", kind="stable")
