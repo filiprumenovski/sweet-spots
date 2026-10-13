@@ -34,7 +34,6 @@ def test_full_workflow_resolves_with_declared_inputs(tmp_path):
             "--dry-run",
             "--cores",
             "2",
-            "all",
         ],
         cwd=tmp_path,
         text=True,

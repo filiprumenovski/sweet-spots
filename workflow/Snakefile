@@ -77,6 +77,7 @@ include: "rules/products/review.smk"
 
 
 rule all:
+    default_target: True
     input:
         f"{RESULTS}/audit/PASS",
         f"{RESULTS}/review/index.html",
