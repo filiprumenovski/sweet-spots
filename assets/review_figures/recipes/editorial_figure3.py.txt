@@ -1,0 +1,49 @@
+"""Focused Figure 3; derived directly from archived evolution summaries."""
+from pathlib import Path
+B=Path(__file__).resolve().parents[1]
+source=(B/'work/analytics_figures.py').read_text()
+pre=source[:source.index('# 2. Every')]
+pre=pre.replace("O=B/'outputs/Figures_Analytics_Review'","O=B/'outputs/Figures_Current_Review'")
+pre=pre.replace("TMP=B/'work/figure_analytics'","TMP=B/'work/figure_editorial'")
+pre=pre.replace("else .48 if n=='3' and key in 'CD'", "else .15 if n=='3' and key in 'CD'")
+exec(compile(pre,__file__,'exec'))
+CURRENT='3'
+f,a=layout('3','Prediction transfers; local S/T capacity persists',[['A','A'],['B','C']],6.3,[.88,1.12])
+for key,title in zip('ABC',['Transfer across species without alignment','S/T retention at two spatial scales','Additional local S/T capacity']):label(a[key],key,title)
+e=js('evolution')
+transfer=sorted(e['transfer'],key=lambda r:{'mouse':0,'Arabidopsis':1,'rice':2,'human':3}[r['species']])
+names=['Human → mouse','Human → Arabidopsis','Human → rice','Rice → human']
+forest(a['A'],names,[r['auroc'] for r in transfer],[r['ci'][0] for r in transfer],[r['ci'][1] for r in transfer],[BLUE,BLUE,TEAL,TEAL])
+a['A'].set(xlim=(.5,1),xlabel='Transfer AUROC (95% protein-bootstrap CI)')
+a['A'].set_xticks([.5,.6,.7,.8,.9,1]);null(a['A'],.8,axis='x')
+for y,r in zip(np.arange(4)[::-1],transfer):
+ a['A'].text(.99,y,f"{r['auroc']:.3f}",ha='right',va='center',fontsize=7,color=INK)
+ # Denominators appear by each species label, rather than being lost in the note.
+ idx=3-y;names[idx]+=f"\n{r['n_proteins']} proteins / {r['n_tiles']:,} tiles"
+a['A'].set_yticklabels(names,fontsize=6.5)
+c=pd.DataFrame(e['site_conservation']);raw=csv('evolution/site_conservation')
+assert set(c.species)==set(raw.species)
+for r in c.itertuples():
+ g=raw[raw.species==r.species]
+ assert len(g)==r.n_sites and g.accession.nunique()==r.n_proteins
+ assert np.isclose(g.exact.mean(),r.exact,atol=1e-13)
+ assert np.isclose(g.regional.mean(),r.regional,atol=1e-13)
+ assert np.isclose((g.regional-g.exact).mean(),r.gap,atol=1e-13)
+ assert np.isclose(r.regional-r.exact,r.gap,atol=1e-13)
+y=np.arange(len(c))[::-1];names=['Mouse','Rat','Zebrafish','Fly','Worm'];ax=a['B'];ax.grid(False)
+for yy,r in zip(y,c.itertuples()):
+ ax.plot([r.exact,r.regional],[yy,yy],color=LIGHT,lw=3,zorder=1)
+ax.scatter(c.exact,y,color=GREY,s=23,marker='s',label='Exact column',zorder=2)
+ax.scatter(c.regional,y,color=TEAL,s=25,label='Within ±5 human residues',zorder=3)
+ax.set_yticks(y,names);ax.set(xlim=(0,1.03),ylim=(-.65,5.7),xlabel='Fraction retaining S/T')
+ax.set_xticks([0,.25,.5,.75,1]);ax.legend(frameon=False,loc='upper left',fontsize=6,handletextpad=.5)
+ax.grid(axis='x',color='#edf0f2')
+forest(a['C'],[f'{name} · n={int(r.n_proteins)}' for name,r in zip(names,c.itertuples())],c.gap.to_list(),[v[0] for v in c.gap_ci],[v[1] for v in c.gap_ci],[TEAL]*len(c))
+a['C'].set(xlim=(-.02,.6),ylim=(-.65,5.7),xlabel='Local − exact retention (95% CI)')
+a['C'].set_xticks([0,.2,.4,.6]);a['C'].tick_params(axis='y',labelsize=6.5);null(a['C'],0,axis='x')
+a['C'].text(.97,.94,'n = proteins',ha='right',va='top',fontsize=6,transform=a['C'].transAxes)
+# Curves/intervals are reused exactly; no bootstrap or model is rerun.
+pd.DataFrame(transfer).to_json(O/'Figure_3A_transfer.json',orient='records',indent=2)
+c.to_json(O/'Figure_3BC_retention.json',orient='records',indent=2)
+finish(f,'3','A: Archived transfer estimates and protein-bootstrap CIs; dashed line is the archived 0.80 benchmark. B/C: Ortholog S/T availability at human O-GlcNAc site anchors, not measured ortholog modification. Local means ±5 human residues mapped through the alignment. B: Observed fractions. C: Archived paired protein-bootstrap intervals; cohorts differ by species. A wider window offers more opportunities, so the gap alone is not evidence of selection. Model and null comparisons are retained in supporting evidence.')
+(O/'Figure_3_source_manifest.json').write_text(json.dumps({'input_hashes':USED,'outputs':MAN,'panels':GEOMETRY,'row_gaps':ROW_GAPS,'gutters':GUTTERS,'no_refitting':True},indent=2))

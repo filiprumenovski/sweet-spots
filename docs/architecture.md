@@ -56,3 +56,18 @@ Lossless NumPy bundles carry model
 features between preparation and fit stages; CSV remains the human-review
 boundary for final tables. Kinase percentiles are reduced in original global
 pair order, so changing the number of scheduling shards does not change sums.
+
+## Review boundary
+
+The immutable reference lives in `reference/`, outside writable `results/`.
+Input identity is enforced before execution. The audit compares the full ledger,
+sensitivity grids, prediction fingerprints, generated figures and retained
+editorial provenance. The report job writes durable JSON; a separate gate fails
+without deleting it. `make review` creates the offline HTML report before that
+gate runs. See [the review guide](review.md).
+
+All scientific rules declare the shared scientific source set, locked environment
+and configuration as inputs. This conservatively rebuilds scientific jobs after
+a scientific code change. Reporting code is tracked separately so presentation
+changes do not retrain models. Source hashes in the report identify the files
+used for the reviewed run.

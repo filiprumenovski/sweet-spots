@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "reference_commit": "c03b09bcb170767f8319bf08df18e1bedbed979e",
+  "scope": "Editorial exports are retained; source products are reproduced and verified. Historical recipes are records, not portable pipeline commands.",
+  "files": {
+    "assets/review_figures/Figure_4.png": "88db2421a124f5ed6a50d7cb9ff49b21adebe3800ab8217f3161c96a5ebf5617",
+    "assets/review_figures/Figure_5.png": "9343e13952878effaf6239fa41bcf3d7e9cbb02bf9093e71e2f6684b36daeb3c",
+    "assets/review_figures/Figure_5.pdf": "7a0fc1f240c4a3b4bda910daeaa0bf3d82a1b5216ccd4bb85df62913a980749e",
+    "assets/review_figures/Figure_4.pdf": "46e2372f5277d65b1c400d2e1b616220af330def29a9549f8e0ea19ed59cb0ad",
+    "assets/review_figures/Figure_2.png": "720940d3db5c3415c874d443f1673c5378408a8e66d7ee70ebf6045608705056",
+    "assets/review_figures/Figure_1.pdf": "96e554a428d45fe02fb7c39e69537a9c481cf0bbbfa1a22bab3ed50c2036e3f1",
+    "assets/review_figures/Figure_3.png": "ce6f2b7fc3b3b4f153d48f167e60149cce35b46db124c9ed2f34c6ff415d1da6",
+    "assets/review_figures/Figure_1.png": "153d52508a5d38142cbd76cb46172c5a81902623418c833c416cddc35d002508",
+    "assets/review_figures/Figure_3.pdf": "bdf0e563a912554e25f7cbae25ca1bf4a728610ae4611ba8192511e19cf1a704",
+    "assets/review_figures/Figure_2.pdf": "bfe5ceb10a1b32e6c552eed6c3babeaebaf1986bf959079003c5d72d47c1b908",
+    "assets/review_figures/captions.json": "54a95696fc162708fecf9e38188848a7ced10a62678031b6caf545af888b7a72",
+    "assets/review_figures/Figure_1.svg": "9c3d2d86bd8bdc46643e65b35f583310311979010b9abc80d94e3a2ed58e6fee",
+    "assets/review_figures/Figure_3.svg": "8193c95d5fa4d2741c38d02527b1bc7aa8b3c20bbb17a4416bed163e8cc20fd2",
+    "assets/review_figures/Figure_2.svg": "8216d1aa44ed247c610716ce139bd73ebc369ef0e69185d24b0745039374d2f3",
+    "assets/review_figures/Figure_5.svg": "928d35a6381e37954fd517c53259f17dcdf87232902942bb0d15d134c51d6d0a",
+    "assets/review_figures/Figure_4.svg": "387798270a4d7f3d3d5ae0ffc2b30178aca9f2297d743005bd8f19a42f4046f1",
+    "assets/review_figures/Figure_S4.svg": "fc537e818e752b950c8eee6ebfabb86e3f3715c1e673585d441d2f7ecd485ba7",
+    "assets/review_figures/Figure_S3.svg": "54881e60495b428e4d2a104ac0e33d45b5c22d893b0ff0e4f88af61862b5bd26",
+    "assets/review_figures/Figure_S2.svg": "290c031e6793d7905e2813671966b485a85a56fa188555f33a25c6b9a223cc85",
+    "assets/review_figures/Figure_S1.svg": "c0977d219d9a941bcdaece16ec493aa7836b7a6c63b25d9994e8643726e2e133",
+    "assets/review_figures/Figure_S3.pdf": "5ec6197f0e755abc37904b7991075b842158e19bb1d35488f5d542cf6cb49114",
+    "assets/review_figures/Figure_S1.png": "f1d81477eccabed89de53ccefe95c4a3999f42d55cd5c3d3f036effe63fdda47",
+    "assets/review_figures/Figure_S2.pdf": "7c752e92b20008719b5ea1c7f6b5853dd1cb07b59b94d6a9ad193abaee526215",
+    "assets/review_figures/Figure_S2.png": "6f4d17cc508d5433100deed0d7b477850e83f1bfb252358ec08b87cd57c4283e",
+    "assets/review_figures/Figure_S3.png": "a3aa32e8253415b206549d59e86ef9486684ff164b2edd1f0a789ea566b34c80",
+    "assets/review_figures/Figure_S1.pdf": "eeb51c5aef9bb41088788d4d35bf53f2df3e710b0c5fa6d721f3e75ae6910e78",
+    "assets/review_figures/Figure_S4.pdf": "56eb9945b6f5cccca143738f82bdb4ed9a69cf0390c8584141ffeceb019a640b",
+    "assets/review_figures/Figure_S4.png": "c65dd792ac7ac43ff2c29bbb2010d2154d4a3bef9724fafb341ed9ea7e689de7",
+    "assets/review_figures/retained_sources/Authored_Figure_4.pdf": "134c31067851bdd1e18197deedc9a55b14434b95c9d08c07e50e5334482b7b8e",
+    "assets/review_figures/retained_sources/Table_S3.xlsx": "85dc9da9f7f2bbfd8916c50e2b9c4e2b3ff81053a52a5f6dc6a39b5d3bc17f61",
+    "assets/review_figures/retained_sources/Authored_Figure_1.pdf": "26e6264cbf02bfb28d67c4456e2928d1ed1780a857c2d25d7843a06b4870a208",
+    "assets/review_figures/retained_sources/Review_Figure_S3.pdf": "82f712b059e3a5a1442872a6847c8e3f436dd77df79c77e1963b8fdff7fcfe7c",
+    "assets/review_figures/retained_sources/Authored_Figure_S3.pdf": "b144fed8b5ad8ddfab4915cd87f298fbafc7e1cd5beb54228ff1470ca15b1ea4",
+    "assets/review_figures/retained_sources/Authored_Figure_S1.pdf": "f3534e47efe0eb41a19c794f2e85b2e7963d1a7a2b8bcde47d8b142676ebe54f",
+    "assets/review_figures/recipes/aligned_figures.py.txt": "f44d423c872e34950f35d1ef9305cbaa8a917aad0f06de153c944eecee284e87",
+    "assets/review_figures/recipes/legacy_panel_layout.py.txt": "26628c67ddf3589e184d9cf5430caffbac5716dd015c705e53824f831a448074",
+    "assets/review_figures/recipes/editorial_figure3.py.txt": "568ecfa0be1a35ec8cef3104de1d03cac7722c9f59bfbddb34bb2a13391ff631",
+    "assets/review_figures/recipes/analytics_figures.py.txt": "7f389213451648e9bf9f182deda2d561a457ecca6976ff74c8827141586d14e9",
+    "assets/review_figures/reference/regional_code/acceptor_model.csv": "3101986f61bb711b3de9cb74fd933a5b76f297280ab5df14d48ec574d46ff61d",
+    "assets/review_figures/reference/fg_nup_recovery/summary.json": "98fbcffa3f9a0dd9adad684f9c466ec1e949ae3196cc68bfa42b30628f4e20eb",
+    "assets/review_figures/reference/adversarial_deletion/random_envelope.csv": "298861cb3b16825510b0af372d0667ad9b546225e46e0f3679d6b18da86fc760",
+    "assets/review_figures/reference/evolution/summary.json": "1858ae4e63f32ec419062d8e4bbe7c5c3c4fa1dd2a012442ca0afe02ef336af1"
+  },
+  "sources": {
+    "assets/review_figures/retained_sources/Authored_Figure_1.pdf": "26e6264cbf02bfb28d67c4456e2928d1ed1780a857c2d25d7843a06b4870a208",
+    "results/analysis/self_clustering/per_protein.csv": "58776b74c87a2b03fc66fbec1a2902d0f2700492dc723dca736b18397974fd03",
+    "results/analysis/self_clustering/fold_ratios.csv": "e6d424cb024affcc5f5fd11d8cc503bdac3dd31fb96beca4079d15d5a8f47c40",
+    "results/analysis/evidence_restricted_clustering/per_scale.csv": "6f420652db7a87fe11b173dc4a31bb60ebf258018d499f1fe6396cdb2dc1100f",
+    "results/analysis/detection_aware_clustering/summary.json": "c0b8c480e7a222bfc6405998d9235040519f8f22cfa05a0f09b73d6be6973cf4",
+    "results/analysis/adversarial_deletion/adversarial_curve.csv": "6a26135a6beb572fd7d98d4e4ed92bdf6029231f130b98f262358821d7c63dc1",
+    "results/analysis/adversarial_deletion/random_envelope.csv": "298861cb3b16825510b0af372d0667ad9b546225e46e0f3679d6b18da86fc760",
+    "results/analysis/regional_code/held_out_tiles.csv": "3a0f895a5317a572239f204cefff326b5e28ce5ca620f8b5ee598f760a79ab3f",
+    "results/analysis/regional_code/summary.json": "c20bf725d8f46b7f4c56a7a776415ba74c96ba6bfa1f2d024d6bd7279ecc18ef",
+    "results/analysis/regional_code/acceptor_model.csv": "3101986f61bb711b3de9cb74fd933a5b76f297280ab5df14d48ec574d46ff61d",
+    "results/analysis/regional_code/per_protein.csv": "8b85413b78098f7e7c849534adafd4a4944dbb0c6c6ee996502bd2d5a6e07513",
+    "results/analysis/region_definition_sensitivity/model_grid.csv": "58bd34f0117bfc3122126b752f66a37367f70e7381305e96ec67d180be826ab9",
+    "results/analysis/consensus_regions/consensus_regions.csv": "2a40cb8facc16f9de1ca9abc064281547b5478e8287eec148677900937ebce03",
+    "results/analysis/fg_nup_recovery/proteins.csv": "1e06efeacd82d89c0dd023612622c0389be86e0cb046c9b5f321898b225c7b50",
+    "results/analysis/evolution/summary.json": "1858ae4e63f32ec419062d8e4bbe7c5c3c4fa1dd2a012442ca0afe02ef336af1",
+    "results/analysis/evolution/site_conservation.csv": "436a9f06683260f45e176a1f6132e9387e69ff32305864acaddbe940aa9c23b8",
+    "results/analysis/regional_code/proline_profiles.csv": "e6059afbe00ff3f996ec022910d87a3a08979a6a572cd528619a6a1a6e3305f9",
+    "results/analysis/yin_yang/kinase_summary.csv": "eed3335f3d64aa11f54059e46e7e84cc4c364a57456a10d3d67ff94ea51afc7e",
+    "results/analysis/yin_yang/summary.json": "44518b18d86fb15a97125409f683f8095169c29094e64c2bb64f1b6b6fc3d750",
+    "results/analysis/regional_code/distance_profile.csv": "fc88654c6372f6e6ebf91afe0cd9e2507196a89a59a17d2a95f95cc29824f981",
+    "results/analysis/fg_nup_recovery/summary.json": "98fbcffa3f9a0dd9adad684f9c466ec1e949ae3196cc68bfa42b30628f4e20eb",
+    "results/analysis/scanner/outer_folds.csv": "f12c9096c8b83d8a915698e55a75ee0c507ba09180a563b7e5484aa5f8cd2c8e",
+    "results/analysis/scanner/outer_predictions.csv": "0d74c30db387c8322c5436949c5747818921dc8a085b847d833a9af76fd53394",
+    "results/analysis/scanner/summary.json": "0ec17945bb4eba643e18800375e40ba41449314f97cfa0414ef54d775de8e4cd",
+    "results/analysis/scanner/operating_points.csv": "8f0aa9093c70a9ea4f9ab3f151a281bcdac38fd56839e62695e881ec8add4376",
+    "results/analysis/region_definition_sensitivity/catalogue_grid.csv": "af02a4bb5bb92669f954630f1a19a1338eb6d2112c6fa1982bae3903216a7f7d",
+    "assets/review_figures/retained_sources/Authored_Figure_S1.pdf": "f3534e47efe0eb41a19c794f2e85b2e7963d1a7a2b8bcde47d8b142676ebe54f",
+    "assets/review_figures/retained_sources/Table_S3.xlsx": "85dc9da9f7f2bbfd8916c50e2b9c4e2b3ff81053a52a5f6dc6a39b5d3bc17f61",
+    "results/analysis/yin_yang/kinase_site_scores.csv": "01146ea3a9409f98be0248a20aff8b66dd46bd48a44f651d4095f8d2771a05b4",
+    "assets/review_figures/retained_sources/Authored_Figure_S3.pdf": "b144fed8b5ad8ddfab4915cd87f298fbafc7e1cd5beb54228ff1470ca15b1ea4",
+    "assets/review_figures/retained_sources/Review_Figure_S3.pdf": "82f712b059e3a5a1442872a6847c8e3f436dd77df79c77e1963b8fdff7fcfe7c",
+    "assets/review_figures/retained_sources/Authored_Figure_4.pdf": "134c31067851bdd1e18197deedc9a55b14434b95c9d08c07e50e5334482b7b8e"
+  },
+  "figures": [
+    {
+      "figure": "Figure_1",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/aligned_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_1.pdf"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/self_clustering/per_protein.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/self_clustering/fold_ratios.csv"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/evidence_restricted_clustering/per_scale.csv",
+            "results/analysis/detection_aware_clustering/summary.json"
+          ]
+        },
+        {
+          "panel": "E",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_1.pdf"
+          ]
+        },
+        {
+          "panel": "F",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/adversarial_deletion/adversarial_curve.csv",
+            "results/analysis/adversarial_deletion/random_envelope.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_2",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/analytics_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/regional_code/held_out_tiles.csv",
+            "results/analysis/regional_code/summary.json"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/regional_code/acceptor_model.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/regional_code/held_out_tiles.csv",
+            "results/analysis/regional_code/per_protein.csv"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/region_definition_sensitivity/model_grid.csv"
+          ]
+        },
+        {
+          "panel": "E",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/regional_code/held_out_tiles.csv",
+            "results/analysis/regional_code/per_protein.csv",
+            "results/analysis/consensus_regions/consensus_regions.csv",
+            "results/analysis/fg_nup_recovery/proteins.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_3",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/editorial_figure3.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/evolution/summary.json"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/evolution/site_conservation.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/evolution/summary.json",
+            "results/analysis/evolution/site_conservation.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_4",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/analytics_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/self_clustering/per_protein.csv"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/regional_code/proline_profiles.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/yin_yang/kinase_summary.csv",
+            "results/analysis/yin_yang/summary.json"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/yin_yang/summary.json"
+          ]
+        },
+        {
+          "panel": "E",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/yin_yang/summary.json"
+          ]
+        },
+        {
+          "panel": "F",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/regional_code/distance_profile.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_5",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/analytics_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/fg_nup_recovery/proteins.csv",
+            "results/analysis/fg_nup_recovery/summary.json",
+            "results/analysis/consensus_regions/consensus_regions.csv"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/scanner/outer_folds.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/scanner/outer_predictions.csv",
+            "results/analysis/scanner/summary.json"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/scanner/operating_points.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_S1",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/aligned_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/region_definition_sensitivity/catalogue_grid.csv"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_S1.pdf"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/consensus_regions/consensus_regions.csv"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_S1.pdf"
+          ]
+        },
+        {
+          "panel": "E",
+          "origin": "retained table",
+          "sources": [
+            "assets/review_figures/retained_sources/Table_S3.xlsx",
+            "results/analysis/self_clustering/fold_ratios.csv"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_S2",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/analytics_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/yin_yang/kinase_site_scores.csv"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/yin_yang/kinase_site_scores.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/yin_yang/summary.json"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_S3",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/aligned_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_S3.pdf"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_S3.pdf"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_S3.pdf"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Review_Figure_S3.pdf"
+          ]
+        },
+        {
+          "panel": "E",
+          "origin": "retained vectors",
+          "sources": [
+            "assets/review_figures/retained_sources/Authored_Figure_4.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "figure": "Figure_S4",
+      "asset_status": "retained editorial export (2026-10-11)",
+      "recipe": "assets/review_figures/recipes/aligned_figures.py.txt",
+      "panels": [
+        {
+          "panel": "A",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/region_definition_sensitivity/catalogue_grid.csv"
+          ]
+        },
+        {
+          "panel": "B",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/region_definition_sensitivity/catalogue_grid.csv"
+          ]
+        },
+        {
+          "panel": "C",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/region_definition_sensitivity/model_grid.csv"
+          ]
+        },
+        {
+          "panel": "D",
+          "origin": "plotted from frozen analysis products",
+          "sources": [
+            "results/analysis/region_definition_sensitivity/model_grid.csv"
+          ]
+        }
+      ]
+    }
+  ]
+}

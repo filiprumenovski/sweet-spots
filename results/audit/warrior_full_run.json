@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-13",
+  "compute_job": 40603439,
+  "compute_commit": "05d6297",
+  "review_code_commit": "10aad0264946e0dd6f9b2d53c1306f8b0cb38a06",
+  "final_validation_job": 40603489,
+  "node": "csy2",
+  "allocated_cpus": 96,
+  "allocated_memory": "320 GiB",
+  "clean_compute_elapsed": "00:18:41",
+  "compute_exit_code": 0,
+  "final_validation_exit_code": 0,
+  "fast_tests_passed": 40,
+  "claims": 82,
+  "catalogue_sensitivity_rows": 45,
+  "model_sensitivity_rows": 15,
+  "regional_prediction_rows": 49394,
+  "scanner_prediction_rows": 314040,
+  "prediction_csvs_byte_identical": true,
+  "audit_sha256": "548bef9ed844c28c372ea0ba7be774a609a17e2eed00a7336cdd7a54b286ee46",
+  "audit_groups": {
+    "catalogue_sensitivity": {
+      "passed": 631,
+      "total": 631
+    },
+    "claims": {
+      "passed": 739,
+      "total": 739
+    },
+    "editorial": {
+      "passed": 75,
+      "total": 75
+    },
+    "figures": {
+      "passed": 19,
+      "total": 19
+    },
+    "inputs": {
+      "passed": 1,
+      "total": 1
+    },
+    "model_sensitivity": {
+      "passed": 406,
+      "total": 406
+    },
+    "predictions": {
+      "passed": 2,
+      "total": 2
+    }
+  },
+  "no_work_on_second_invocation": true,
+  "all_workflow_metadata_present": true,
+  "scientific_source_files_unchanged": 44,
+  "editorial_scope": "Nine retained revised exports and all 41 panel sources verified; retained vector panels and draft captions identified in the report.",
+  "manifest_provenance_job": 40603479
+}

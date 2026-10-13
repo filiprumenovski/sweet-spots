@@ -46,6 +46,7 @@ FIGURE_INPUTS = [
 rule figures:
     input:
         FIGURE_INPUTS,
+        code=CORE_CODE + ["src/regional_code_paper/reporting/figures.py"],
     output:
         pdf=expand(f"{RESULTS}/figures/{{figure}}.pdf", figure=FIGURES),
         png=expand(f"{RESULTS}/figures/{{figure}}.png", figure=FIGURES),

@@ -14,16 +14,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.base import clone
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 from ..core.io import write_csv, write_json, write_npz
 from ..core.validation import protein_group_folds
 from ..models.scanner import (
     QUANTILES,
-    baseline_estimator,
     cluster_recall,
-    inner_oof,
+    fit_outer_fold,
     load_dataset,
 )
 from ..models.scanner_features import make_region_classifier, precision_recall_at_predictions
@@ -66,51 +64,7 @@ def run_fold(cache: Path, metadata: Path, fold: int, output: Path, receipt: Path
     document = json.loads(metadata.read_text(encoding="utf-8"))
     families = document["families"]
     outer_train, outer_test = list(protein_group_folds(groups))[fold]
-    candidates = {
-        "legacy": (legacy, baseline_estimator()),
-        "enhanced": (enhanced, make_region_classifier()),
-        "enhanced_balanced": (
-            enhanced,
-            make_region_classifier().set_params(class_weight="balanced"),
-        ),
-    }
-    inner_predictions: dict[str, np.ndarray] = {}
-    inner_ap: dict[str, float] = {}
-    for name, (matrix, estimator) in candidates.items():
-        values = inner_oof(
-            estimator,
-            matrix[outer_train],
-            labels[outer_train],
-            groups[outer_train],
-        )
-        inner_predictions[name] = values
-        inner_ap[name] = float(average_precision_score(labels[outer_train], values))
-    selected_name = max(inner_ap, key=inner_ap.get)
-    selected_matrix, selected_estimator = candidates[selected_name]
-    estimators = {
-        "baseline": baseline_estimator().fit(legacy[outer_train], labels[outer_train]),
-        "enhanced": make_region_classifier().fit(enhanced[outer_train], labels[outer_train]),
-        "selected": clone(selected_estimator).fit(
-            selected_matrix[outer_train], labels[outer_train]
-        ),
-    }
-    matrices = {"baseline": legacy, "enhanced": enhanced, "selected": selected_matrix}
-    candidate_names = {
-        "baseline": "legacy",
-        "enhanced": "enhanced",
-        "selected": selected_name,
-    }
-    rows = pd.DataFrame({"row_id": outer_test, "fold": fold})
-    thresholds: dict[str, dict[str, float]] = {}
-    for name, estimator in estimators.items():
-        scores = estimator.predict_proba(matrices[name][outer_test])[:, 1]
-        rows[f"{name}_score"] = scores
-        calibration = inner_predictions[candidate_names[name]][labels[outer_train] == 0]
-        thresholds[name] = {}
-        for quantile in QUANTILES:
-            threshold = float(np.quantile(calibration, quantile))
-            thresholds[name][str(quantile)] = threshold
-            rows[f"{name}_q{quantile:g}"] = scores >= threshold
+    rows, fold_metadata = fit_outer_fold(legacy, enhanced, labels, groups, fold)
     for family in ("composition", "geometry", "disorder"):
         columns = np.asarray(families[family], dtype=int)
         estimator = make_region_classifier().fit(
@@ -126,12 +80,7 @@ def run_fold(cache: Path, metadata: Path, fold: int, output: Path, receipt: Path
         shard=shard,
         outputs=[output],
         records=len(rows),
-        metadata={
-            "selected": selected_name,
-            "inner_average_precision": inner_ap,
-            "thresholds": thresholds,
-            "test_positive": int(labels[outer_test].sum()),
-        },
+        metadata=fold_metadata,
     )
 
 

@@ -1,0 +1,187 @@
+"""Register original PDF plot areas against native axes; never estimate new data.
+
+Source paths (including error bars) remain PDF vectors. Only labels are reset.
+Coordinates below are source-page points, not reconstructed observations.
+"""
+import numpy as np
+import pymupdf as fitz
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+
+LAYERS=[]
+AUDIT=[]
+
+def prepare(ax, source, frame, xlabels=None, ylabels=None, erase=()):
+    doc=fitz.open(source);page=doc[0];paths=page.get_drawings()
+    # Snap the reviewed frame coordinates to the original, full-precision spines.
+    r=fitz.Rect(frame)
+    vertical=[p['rect'] for p in paths if p['rect'].width<.01 and p['rect'].height>r.height*.9]
+    horizontal=[p['rect'] for p in paths if p['rect'].height<.01 and p['rect'].width>r.width*.9]
+    coords=[min(vertical,key=lambda p:abs(p.x0-r.x0)).x0,
+            min(horizontal,key=lambda p:abs(p.y0-r.y0)).y0,
+            min(vertical,key=lambda p:abs(p.x0-r.x1)).x0,
+            min(horizontal,key=lambda p:abs(p.y0-r.y1)).y0]
+    assert max(abs(a-b) for a,b in zip(coords,frame))<.06,(source,frame,coords)
+    r=fitz.Rect(coords)
+    xt=sorted({p['rect'].x0 for p in paths if p['rect'].width<.01 and 1<p['rect'].height<3 and abs(p['rect'].y0-r.y1)<.02 and r.x0-.02<=p['rect'].x0<=r.x1+.02})
+    yt=sorted({p['rect'].y0 for p in paths if p['rect'].height<.01 and 1<p['rect'].width<3 and abs(p['rect'].x1-r.x0)<.02 and r.y0-.02<=p['rect'].y0<=r.y1+.02},reverse=True)
+    ax.grid(False);ax.set(xlim=(r.x0,r.x1),ylim=(r.y1,r.y0))
+    if xlabels is None:ax.set_xticks([])
+    else:
+        assert len(xt)==len(xlabels),(source,'x',xt,xlabels)
+        ax.set_xticks(xt,xlabels)
+    if ylabels is None:ax.set_yticks([])
+    else:
+        assert len(yt)==len(ylabels),(source,'y',yt,ylabels)
+        ax.set_yticks(yt,ylabels)
+    # A text-only redaction leaves every data path untouched.
+    for block in page.get_text('dict')['blocks']:
+        for line in block.get('lines',[]):page.add_redact_annot(fitz.Rect(line['bbox']),fill=False)
+    page.apply_redactions(images=0,graphics=0)
+    for rect in erase:page.draw_rect(fitz.Rect(rect),color=None,fill=(1,1,1),overlay=True)
+    LAYERS.append((ax,doc,r,False))
+    pos=ax.get_position();w,h=ax.figure.get_size_inches()*72
+    AUDIT.append({'source':str(source),'source_plot_rect':list(r),
+                  'target_plot_rect_points':[pos.x0*w,pos.y0*h,pos.x1*w,pos.y1*h],
+                  'tick_positions':{'x':xt,'y':yt},'data_paths':'original PDF vectors; no re-estimation'})
+    ax._audit_index=len(AUDIT)-1
+    return r
+
+def note(ax,x,y,text,**kwargs):
+    return ax.text(x,y,text,transform=ax.transAxes,fontsize=6.5,va='top',**kwargs)
+
+def legend(ax,labels,colors,**kwargs):
+    ax.legend([Patch(facecolor=c,edgecolor='#83929a',linewidth=.4) for c in colors],labels,
+              frameon=False,fontsize=6,handlelength=1.1,labelspacing=.25,**kwargs)
+
+def native_forest(ax, expected):
+    # Keep exact PDF center/interval coordinates, with circular point markers in points.
+    target,doc,r,_=LAYERS.pop();assert target is ax
+    points=[];intervals=[]
+    for p in doc[0].get_drawings():
+        b=p['rect'];items=p['items']
+        if not (r+(-.01,-.01,.01,.01)).contains(b):continue
+        if len(items)==8 and all(item[0]=='c' for item in items):
+            x=(b.x0+b.x1)/2;y=(b.y0+b.y1)/2
+            ax.scatter(x,y,s=27,color=p['fill'],zorder=3);points.append([x,y])
+        elif len(items)==1 and items[0][0]=='l':
+            if b.height<.01 and r.y0+.05<b.y0<r.y1-.05:
+                if b.width>r.width*.95:ax.axhline(b.y0,c='#dfe9ed',lw=.7)
+                elif b.width>.1:
+                    ax.plot([b.x0,b.x1],[b.y0,b.y0],c=p['color'],lw=1.7)
+                    ax.plot([b.x0,b.x1],[b.y0,b.y0],ls='none',marker='|',ms=4,c=p['color'])
+                    intervals.append([b.x0,b.y0,b.x1])
+            elif b.height>r.height*.9 and r.x0+.05<b.x0<r.x1-.05:
+                ax.axvline(b.x0,c='#87949c',lw=.8,ls=(0,(3,3)))
+    assert len(points)==expected and len(intervals)==expected,(points,intervals)
+    AUDIT[-1]['native_marker_centers_pdf_points']=points
+    AUDIT[-1]['native_intervals_pdf_points']=intervals
+    doc.close()
+
+def install(ax,old,box,base,archive,track):
+    source=next(archive.glob('0[23]*/Figure_'+old+'.pdf'))
+    key=(old,tuple(box));track(source)
+    if key==('1',(25,35,492,116)):
+        doc=fitz.open(source);page=doc[0]
+        r=fitz.Rect(93.97113800048828,39.5,334.1700134277344,97)
+        tracks=[p for p in page.get_drawings() if r.contains(p['rect']) and p['rect'].width>239 and p['rect'].height<.01]
+        assert len(tracks)==4
+        for block in page.get_text('dict')['blocks']:
+            for line in block.get('lines',[]):page.add_redact_annot(fitz.Rect(line['bbox']),fill=False)
+        page.apply_redactions(images=0,graphics=0)
+        ax.grid(False);ax.spines[['left','top','right']].set_visible(False)
+        ax.set(xlim=(r.x0,r.x1),ylim=(r.y1,r.y0),xlabel='Protein position (residues)')
+        ax.set_xticks([93.97113800048828,140.46124267578125,190.8255157470703,237.3156280517578,287.6799011230469,334.1700134277344],['0','120','250','370','500','620'])
+        ax.set_yticks([43.8463134765625,60.992767333984375,75.5672607421875,91.51348876953125],['All S/T residues','O-GlcNAc sites','Phosphosites','Reported regions'])
+        ax.tick_params(axis='y',length=0)
+        LAYERS.append((ax,doc,r,False))
+        AUDIT.append({'source':str(source),'source_plot_rect':list(r),'data_paths':'four original CRTC3 tracks; no site positions changed','track_count':4})
+        ax._audit_index=len(AUDIT)-1
+        return
+    if key==('1',(8,239,162,338)):
+        prepare(ax,source,(30.05,242.71,160.01,320.98),['A → B','B → A','Held-out\nstudy'],['0','2','4','6','8','10'])
+        ax.set_ylabel('Region-landing odds ratio')
+        note(ax,.96,.94,'Two resources;\nboth directions',ha='right')
+        note(ax,.865,.28,'100% of\n200 splits',ha='center',color='white')
+    elif key==('2',(359,133,514,244)):
+        prepare(ax,source,(379.97,133.18,509.74,233.02),['S/T/P','Aromatic'],[f'{v:.1f}' for v in np.arange(0,.8,.1)],erase=[(457,134,509,149)])
+        ax.set_ylabel('Residue fraction')
+        legend(ax,['Cluster region','Same-protein IDR'],['#1f5c8b','#e6e6e6'],loc='upper right')
+        note(ax,.58,.59,'Mean S/T spacing\n2.17 aa vs 4.85 aa',ha='center')
+        note(ax,.69,.36,'1.95× over\nsame-protein IDR\n$P = 1.4 × 10^{-88}$',ha='center')
+    elif key==('S1',(194,22,348,126)):
+        prepare(ax,source,(218.58,23.35,347.21,110.67),['Strict','Coordinate-\nonly','Ambiguous'],['0','10','20','30','40','50'])
+        ax.set_ylabel('Sites in regions (%)')
+        note(ax,.5,.97,'Ambiguous sites are more clustered',ha='center',color='#5a6c77')
+        for x,val,count in [(.142,'33.6%','824'),(.50,'33.5%','828'),(.858,'37.5%','365')]:
+            note(ax,x,.80 if count=='365' else .73,val,ha='center')
+            note(ax,x,.22,count+'\nregions',ha='center',color='white')
+    elif key==('S1',(0,149,269,250)):
+        prepare(ax,source,(52.56,149.09,264.20,236.41),['0','20','40','60','80','100'],['Largest study\nremoved','≥3 contributing\npublications','≥2 contributing\npublications'])
+        ax.set_xlabel('Consensus regions (%)')
+        for x,y,val in [(.76,.83,'79.2%'),(.68,.50,'70.9%'),(.88,.17,'92.4%')]:note(ax,x,y,val,ha='left')
+    elif old=='S3' and box[1]==24:
+        left=box[0]==20
+        frame=(48.70,24.87,249.15,105.88) if left else (285.13,24.87,485.59,105.88)
+        prepare(ax,source,frame,['Raw-count\nPearson','Cosine','1 − JS','Site\nposition'],
+                [f'{v:.1f}' for v in np.arange(0,1.1 if left else .9,.2)],
+                erase=[(193,26,248,45)] if left else [(438,26,485,40)])
+        ax.set_ylabel('Correlation' if left else 'Excess over null')
+        # Legends sit above the data, leaving original data paths visible.
+        legend(ax,['Orthologous','Null A: same protein','Null B: random protein'] if left else ['Excess over null A','Excess over null B'],
+               ['#1f5c8b','#e6e6e6','#ffffff'] if left else ['#1f5c8b','#7f7f7f'],
+               loc='lower left',bbox_to_anchor=(0,1.015),borderaxespad=0)
+        if left:ax.get_legend().legend_handles[2].set_hatch('///')
+    elif key==('S3',(5,140,254,237)):
+        prepare(ax,source,(48.70,141.53,249.15,222.54),[f'{v:.1f}' for v in np.arange(0,.7,.1)],['Zero-variance\npairs excluded','Zero-imputed\n(primary)'])
+        native_forest(ax,2)
+        ax.set_xlabel('Positional correlation')
+        note(ax,.98,.96,'Excluded arm drops 77/168 pairs;\ncannot be null-calibrated',ha='right',color='#5a6c77')
+    elif key==('S3',(232,140,493,237)):
+        source=base/'outputs/Cell_Systems_Review/03_Supplemental_Figures/Figure_S3.pdf';track(source)
+        prepare(ax,source,(327.90,201.36,488.08,266.10),['0','5','10','15','20','25'])
+        ax.set_xlabel('Mouse O-GlcNAc–bearing columns (%)')
+        ax.set_yticks([219.0,251.2],['Projected window\nOR 21.35\n(4.73–96.92)','Alignment-free\nOR 1.22\n(0.90–1.59)'],fontsize=6.5)
+        note(ax,.52,.78,'24 / 188 cluster columns')
+        note(ax,.06,.57,'13 / 1,948 control columns')
+        note(ax,.13,.19,'303 sites on 67 proteins')
+    elif key==('4',(341,142,493,252)):
+        # The three log ticks are selected explicitly; the PDF also has minor ticks.
+        prepare(ax,source,(359.88,142.96,489.28,236.79))
+        native_forest(ax,4)
+        ax.set_xticks([392.7503662109375,429.8487243652344,466.94708251953125],['1','10','100'])
+        ax.set_xlabel('Ratio (null = 1; log scale)')
+        note(ax,.02,.94,'Sticker introduction (RR)',color='#5a6c77')
+        note(ax,.98,.83,'Mammalian rung',ha='right')
+        note(ax,.98,.60,'All orthologs',ha='right')
+        note(ax,.02,.46,'Mouse site landing (OR)',color='#5a6c77')
+        note(ax,.02,.32,'Projected window')
+        note(ax,.98,.16,'Alignment-free scanner\n24 / 188 vs 13 / 1,948',ha='right')
+    elif key==('4',(17,140,164,236)):
+        pos=ax.get_position();ax.set_axis_off()
+        ax._layout_children=[]
+        frames=[(29.72,159.85,67.24,218.03),(73.07,159.85,110.59,218.03),(116.42,159.85,153.94,218.03)]
+        for i,(frame,title,auc) in enumerate(zip(frames,['Mammal','Vertebrate','All orthologs'],['.55 / .70 / .72','.51 / .68 / .67','.52 / .62 / .64'])):
+            sub=ax.figure.add_axes([pos.x0+i*pos.width*.352,pos.y0,pos.width*.296,pos.height])
+            ax._layout_children.append(sub)
+            prepare(sub,source,frame)
+            sub.set_xticks([sub.get_xlim()[0],sub.get_xlim()[1]],['0','1'])
+            sub.set_yticks([sub.get_ylim()[0],sub.get_ylim()[1]],['0','1'] if i==0 else [])
+            sub.tick_params(labelsize=6.5,length=2)
+            sub.spines[['top','right']].set_visible(False)
+            sub.set_title(title,fontsize=6.5,pad=5)
+            note(sub,.5,.07,auc,ha='center',color='#5a6c77')
+            if i==0:sub.set_ylabel('True-positive rate')
+        ax.text(.5,-.24,'False-positive rate',transform=ax.transAxes,ha='center',fontsize=8)
+        ax.legend([Line2D([],[],color=c,lw=1.3)for c in ['#7f7f7f','#1f5c8b','#107c6c']],['S/T density','Composition','Combined'],loc='lower left',bbox_to_anchor=(0,1.13),ncol=3,fontsize=5.8,frameon=False,columnspacing=.8,handlelength=1)
+    else:raise ValueError(key)
+
+def composite(figure, foreground, target):
+    out=fitz.open();page=out.new_page(width=foreground[0].rect.width,height=foreground[0].rect.height)
+    for ax,doc,source,preserve_aspect in LAYERS:
+        pos=ax.get_position();w,h=page.rect.width,page.rect.height
+        dest=fitz.Rect(pos.x0*w,(1-pos.y1)*h,pos.x1*w,(1-pos.y0)*h)
+        page.show_pdf_page(dest,doc,0,clip=source,keep_proportion=preserve_aspect)
+        doc.close()
+    page.show_pdf_page(page.rect,foreground,0)
+    out.save(target,garbage=4,deflate=True);out.close();LAYERS.clear()

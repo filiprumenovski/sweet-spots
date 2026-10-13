@@ -5,6 +5,7 @@ DETECTION_PREP = f"{RESULTS}/work/detection_aware_clustering/prepared"
 
 rule detection_aware_clustering_prepare:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
     output:
         proteins=f"{DETECTION_PREP}/proteins.csv",
@@ -25,6 +26,7 @@ rule detection_aware_clustering_prepare:
 
 rule detection_aware_clustering_shard:
     input:
+        code=SCIENCE_CODE,
         proteins=rules.detection_aware_clustering_prepare.output.proteins,
         strata=rules.detection_aware_clustering_prepare.output.strata,
     output:
@@ -53,6 +55,7 @@ rule detection_aware_clustering_shard:
 
 rule detection_aware_clustering:
     input:
+        code=SCIENCE_CODE,
         prepared_summary=rules.detection_aware_clustering_prepare.output.summary,
         shards=expand(
             f"{RESULTS}/work/detection_aware_clustering/shard_{{shard}}.csv",

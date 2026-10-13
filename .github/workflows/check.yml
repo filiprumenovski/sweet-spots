@@ -1,0 +1,24 @@
+name: Reproducibility checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  synthetic:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.10'
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+      - run: make check
+      - run: uv run --frozen duckdb --version

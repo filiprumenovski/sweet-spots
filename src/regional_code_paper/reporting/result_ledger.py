@@ -1,8 +1,8 @@
 """Assemble a tidy, machine-readable ledger of manuscript-facing results.
 
 Each row is one estimand.  The table is intentionally boring: no display
-rounding, no prose scraping, and no inferred units.  Figures and the audit both
-consume this same ledger so a number cannot drift independently in three places.
+rounding, no prose scraping, and no inferred units. The audit compares this
+ledger with the frozen reference; figures read the declared analysis products.
 """
 
 from __future__ import annotations

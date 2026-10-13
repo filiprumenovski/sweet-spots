@@ -16,13 +16,13 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
 
 from ..core.config import load_config
 from ..core.io import write_csv, write_json
 from ..core.randomness import stable_seed
 from ..core.validation import protein_group_folds
+from ..models.regional import regional_estimator
 from .consensus_regions import load_sequences, load_site_evidence, segment_positions
 from .regional_code import COMPOSITION_FEATURES, bootstrap_interval, build_tiles, load_inputs
 
@@ -187,13 +187,7 @@ def held_out_scores(tiles: pd.DataFrame, seed: int) -> pd.DataFrame:
     for model_name, features in MODEL_FEATURES.items():
         scores = np.empty(len(tiles), dtype=float)
         for train, test in protein_group_folds(groups):
-            model = HistGradientBoostingClassifier(
-                max_iter=300,
-                max_depth=3,
-                learning_rate=0.04,
-                l2_regularization=1.0,
-                random_state=seed,
-            )
+            model = regional_estimator(seed)
             model.fit(tiles.iloc[train][list(features)], labels[train])
             scores[test] = model.predict_proba(tiles.iloc[test][list(features)])[:, 1]
         scored[f"{model_name}_score"] = scores

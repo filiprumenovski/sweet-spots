@@ -5,6 +5,7 @@ SCANNER_WORK = f"{RESULTS}/work/scanner"
 
 rule scanner_prepare:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
         regions=rules.consensus_regions.output.regions,
     output:
@@ -26,6 +27,7 @@ rule scanner_prepare:
 
 rule scanner_fold:
     input:
+        code=SCIENCE_CODE,
         validation="src/regional_code_paper/core/validation_folds.json",
         cache=rules.scanner_prepare.output.cache,
         metadata=rules.scanner_prepare.output.metadata,
@@ -53,6 +55,7 @@ rule scanner_fold:
 
 rule scanner:
     input:
+        code=SCIENCE_CODE,
         cache=rules.scanner_prepare.output.cache,
         metadata=rules.scanner_prepare.output.metadata,
         shards=expand(f"{SCANNER_WORK}/folds/fold_{{fold}}.csv", fold=OUTER_FOLDS),

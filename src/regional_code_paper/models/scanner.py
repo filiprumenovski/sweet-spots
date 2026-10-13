@@ -228,7 +228,9 @@ def inner_oof(estimator, matrix, labels, groups) -> np.ndarray:
     return predictions
 
 
-def evaluate_nested(legacy, enhanced, labels, groups):
+def fit_outer_fold(legacy, enhanced, labels, groups, fold):
+    """Select and calibrate exclusively on training proteins; score held-out rows."""
+    outer_train, outer_test = list(protein_group_folds(groups))[fold]
     candidates = {
         "legacy": (legacy, baseline_estimator()),
         "enhanced": (enhanced, make_region_classifier()),
@@ -237,6 +239,52 @@ def evaluate_nested(legacy, enhanced, labels, groups):
             make_region_classifier().set_params(class_weight="balanced"),
         ),
     }
+    inner_predictions: dict[str, np.ndarray] = {}
+    inner_ap: dict[str, float] = {}
+    for name, (matrix, estimator) in candidates.items():
+        values = inner_oof(
+            estimator,
+            matrix[outer_train],
+            labels[outer_train],
+            groups[outer_train],
+        )
+        inner_predictions[name] = values
+        inner_ap[name] = float(average_precision_score(labels[outer_train], values))
+    selected_name = max(inner_ap, key=inner_ap.get)
+    selected_matrix, selected_estimator = candidates[selected_name]
+    estimators = {
+        "baseline": baseline_estimator().fit(legacy[outer_train], labels[outer_train]),
+        "enhanced": make_region_classifier().fit(enhanced[outer_train], labels[outer_train]),
+        "selected": clone(selected_estimator).fit(
+            selected_matrix[outer_train], labels[outer_train]
+        ),
+    }
+    matrices = {"baseline": legacy, "enhanced": enhanced, "selected": selected_matrix}
+    candidate_names = {
+        "baseline": "legacy",
+        "enhanced": "enhanced",
+        "selected": selected_name,
+    }
+    rows = pd.DataFrame({"row_id": outer_test, "fold": fold})
+    thresholds: dict[str, dict[str, float]] = {}
+    for name, estimator in estimators.items():
+        scores = estimator.predict_proba(matrices[name][outer_test])[:, 1]
+        rows[f"{name}_score"] = scores
+        calibration = inner_predictions[candidate_names[name]][labels[outer_train] == 0]
+        thresholds[name] = {}
+        for quantile in QUANTILES:
+            threshold = float(np.quantile(calibration, quantile))
+            thresholds[name][str(quantile)] = threshold
+            rows[f"{name}_q{quantile:g}"] = scores >= threshold
+    return rows, {
+        "selected": selected_name,
+        "inner_average_precision": inner_ap,
+        "thresholds": thresholds,
+        "test_positive": int(labels[outer_test].sum()),
+    }
+
+
+def evaluate_nested(legacy, enhanced, labels, groups):
     scores = {
         name: np.full(len(labels), np.nan) for name in ("baseline", "enhanced", "selected")
     }
@@ -246,49 +294,14 @@ def evaluate_nested(legacy, enhanced, labels, groups):
         for name in scores
     }
     fold_rows = []
-    for fold_index, (outer_train, outer_test) in enumerate(
-        protein_group_folds(groups)
-    ):
-        inner_predictions = {}
-        inner_ap = {}
-        for name, (matrix, estimator) in candidates.items():
-            values = inner_oof(
-                estimator,
-                matrix[outer_train],
-                labels[outer_train],
-                groups[outer_train],
-            )
-            inner_predictions[name] = values
-            inner_ap[name] = float(average_precision_score(labels[outer_train], values))
-        selected_name = max(inner_ap, key=inner_ap.get)
-        selected_matrix, selected_estimator = candidates[selected_name]
-        fitted = {
-            "baseline": baseline_estimator().fit(legacy[outer_train], labels[outer_train]),
-            "enhanced": make_region_classifier().fit(
-                enhanced[outer_train], labels[outer_train]
-            ),
-            "selected": clone(selected_estimator).fit(
-                selected_matrix[outer_train], labels[outer_train]
-            ),
-        }
-        score_matrices = {
-            "baseline": legacy,
-            "enhanced": enhanced,
-            "selected": selected_matrix,
-        }
-        candidate_names = {
-            "baseline": "legacy",
-            "enhanced": "enhanced",
-            "selected": selected_name,
-        }
+    for fold_index, (_outer_train, outer_test) in enumerate(protein_group_folds(groups)):
+        rows, metadata = fit_outer_fold(legacy, enhanced, labels, groups, fold_index)
+        selected_name = metadata["selected"]
+        inner_ap = metadata["inner_average_precision"]
         for name in scores:
-            scores[name][outer_test] = fitted[name].predict_proba(
-                score_matrices[name][outer_test]
-            )[:, 1]
-            calibration = inner_predictions[candidate_names[name]][labels[outer_train] == 0]
+            scores[name][outer_test] = rows[f"{name}_score"].to_numpy()
             for quantile in QUANTILES:
-                threshold = float(np.quantile(calibration, quantile))
-                predicted[name][quantile][outer_test] = scores[name][outer_test] >= threshold
+                predicted[name][quantile][outer_test] = rows[f"{name}_q{quantile:g}"].to_numpy()
         fold_assignment[outer_test] = fold_index
         fold_rows.append(
             {

@@ -46,6 +46,7 @@ Once the complete `inputs/` tree is present:
 make validate-inputs  # record every input digest
 make dry-run          # inspect the complete execution plan
 make reproduce        # run all analyses, figures, tables, and audits
+make review           # openable HTML review of every claim, figure and source
 ```
 
 The workstation profile uses four cores and a 32 GB aggregate memory ceiling.
@@ -132,7 +133,7 @@ sweet-spots/
 make check
 ```
 
-This runs Ruff, the unit test suite, and the lockfile consistency check. See
+This runs Ruff, unit and synthetic integration tests, and the lockfile consistency check. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for the review contract.
 
 ## Authors and affiliation
@@ -153,3 +154,15 @@ latest deposited release while preserving every earlier version.
 The analysis code is available under the [MIT License](LICENSE). Input data
 retain the licenses and access conditions of their original providers; see the
 [data provenance and licensing table](docs/input_data.md).
+
+## Reviewing a reproduction
+
+Run `make review`, then open `results/review/index.html`. The report compares all
+82 claims and their confidence intervals, both sensitivity tables, complete
+prediction-table fingerprints, generated figures, and the selected revised
+editorial figure set. It includes the actual workflow graph and source links
+for all 41 revised panels. Retained artwork is explicitly identified.
+
+[Reviewer workflow and scope](docs/review.md) explains the immutable baseline,
+CI coverage, failure reports, and the distinction between regenerated analysis
+figures and retained editorial exports.

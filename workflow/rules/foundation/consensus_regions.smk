@@ -3,6 +3,7 @@
 
 rule consensus_regions:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
     output:
         regions=f"{RESULTS}/analysis/consensus_regions/consensus_regions.csv",

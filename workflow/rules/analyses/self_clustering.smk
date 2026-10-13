@@ -3,6 +3,7 @@
 
 rule self_clustering_ptm:
     input:
+        code=SCIENCE_CODE,
         manifest=rules.input_manifest.output,
     output:
         data=f"{RESULTS}/work/self_clustering/{{ptm}}.csv",
@@ -25,6 +26,7 @@ rule self_clustering_ptm:
 
 rule self_clustering:
     input:
+        code=SCIENCE_CODE,
         shards=expand(f"{RESULTS}/work/self_clustering/{{ptm}}.csv", ptm=PTMS),
         receipts=expand(f"{RESULTS}/work/self_clustering/{{ptm}}.receipt.json", ptm=PTMS),
     output:
@@ -47,6 +49,7 @@ rule self_clustering:
 
 rule clustering_breadth:
     input:
+        code=SCIENCE_CODE,
         proteins=rules.self_clustering.output.proteins,
     output:
         per_scale=f"{RESULTS}/analysis/clustering_breadth/per_scale.csv",
@@ -67,6 +70,7 @@ rule clustering_breadth:
 
 rule adversarial_deletion:
     input:
+        code=SCIENCE_CODE,
         proteins=rules.self_clustering.output.proteins,
     output:
         curve=f"{RESULTS}/analysis/adversarial_deletion/adversarial_curve.csv",
