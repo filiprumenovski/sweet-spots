@@ -10,12 +10,14 @@
     {
       "name": "Rumenovski, Filip",
       "affiliation": "Department of Chemistry, Wayne State University",
-      "type": "Researcher"
+      "type": "Researcher",
+      "orcid": "0009-0005-1552-2826"
     },
     {
       "name": "Fehl, Charlie",
       "affiliation": "Department of Chemistry, Wayne State University",
-      "type": "ProjectLeader"
+      "type": "ProjectLeader",
+      "orcid": "0000-0001-6182-0879"
     }
   ],
   "keywords": [
