@@ -1,0 +1,247 @@
+#!/usr/bin/env bash
+# started with "sh reproduce" or similar: switch to bash before any bash syntax is read
+if [ -z "${BASH_VERSION:-}" ]; then exec bash "$0" "$@"; fi
+# Rebuild every analysis, figure, table and audit from scratch with one command:
+#
+#     ./reproduce
+#
+# Needs only bash, curl (or wget), tar and an internet connection on macOS or Linux.
+# Everything else (uv, Python 3.12, every package, every input file) is downloaded
+# into this folder at pinned versions and verified by SHA-256. Nothing is installed
+# system-wide and no environment, account or manual download is required. Settings
+# already present on the machine (virtualenvs, conda, PYTHONPATH, uv config) are
+# ignored. The run is resumable: if it stops, run ./reproduce again.
+#
+# Success ends with "REPRODUCED" and results/audit/PASS. Any failure stops at once
+# with the step that failed and the log to read.
+set -Eeuo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Snakemake does not quote its own interpreter path, so a folder path containing spaces
+# or shell characters breaks it. Work through a plain-named link to the same folder.
+if [[ "$ROOT" =~ [^A-Za-z0-9_./+-] ]]; then
+  base="${TMPDIR:-/tmp}"; [[ "$base" =~ [^A-Za-z0-9_./+-] ]] && base=/tmp
+  link="${base%/}/sweet-spots-$(printf '%s' "$ROOT" | cksum | awk '{print $1}')"
+  ln -sfn "$ROOT" "$link" || { printf 'REPRODUCTION STOPPED: cannot create %s\n' "$link" >&2; exit 1; }
+  exec bash "$link/reproduce" "$@"
+fi
+cd "$ROOT"
+TOOLS="$ROOT/.tools"
+LOG="$ROOT/results/logs/reproduce.log"
+mkdir -p "$TOOLS" "$ROOT/results/logs"
+
+# one run at a time; a lock left by a killed run is cleared automatically
+LOCK="$TOOLS/run.lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  if kill -0 "$(cat "$LOCK/pid" 2>/dev/null)" 2>/dev/null; then
+    printf 'REPRODUCTION STOPPED: another ./reproduce is already running here (pid %s)\n' "$(cat "$LOCK/pid")" >&2; exit 1
+  fi
+  rm -rf "$LOCK"; mkdir "$LOCK"
+fi
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+
+say()  { printf '\n==> %s\n' "$*"; }
+die()  { printf '\nREPRODUCTION STOPPED: %s\n' "$*" >&2; exit 1; }
+trap 'die "unexpected error on line $LINENO (see $LOG if it exists)"' ERR
+
+# ---------------------------------------------------------------- pinned versions
+UV_VERSION="0.12.10"
+PYTHON_VERSION="3.12.13"
+OPEN_INPUTS_URL="https://github.com/filiprumenovski/sweet-spots/releases/download/inputs-v1/sweet-spots-open-inputs-v1.tar.gz"
+OPEN_INPUTS_SHA="4010a15610f2a8d62c5f6ae0728249bf6f21353e42477ebfd359cb8d4c0fd3e8"
+SUPP_INPUTS_URLS=(
+  "https://github.com/filiprumenovski/sweet-spots/releases/download/supplemental-inputs-v1/sweet-spots-input-data-v1.zip"
+  "https://zenodo.org/api/records/23330269/files/sweet-spots-input-data-v1.zip/content"
+)
+SUPP_INPUTS_SHA="969b169a7be0b06c34ef93f694d0211d5d17c936edbdb5e7d9cf709b4c96d330"
+
+# ---------------------------------------------------------------- clean environment
+# Ignore anything on the host that could change which Python or packages are used.
+for v in $(env | grep -oE '^(UV|PIP|CONDA)_[A-Za-z0-9_]*' || true); do unset "$v"; done
+unset VIRTUAL_ENV PYTHONPATH PYTHONHOME PYTHONSTARTUP PYTHONUSERBASE PYTHONNOUSERSITE \
+      PYTHONSAFEPATH SNAKEMAKE_PROFILE R_HOME 2>/dev/null || true
+export UV_NO_CONFIG=1 UV_FROZEN=1 UV_PYTHON_DOWNLOADS=automatic UV_MANAGED_PYTHON=1
+export UV_PYTHON="$PYTHON_VERSION" UV_PROJECT_ENVIRONMENT="$ROOT/.venv"
+export UV_CACHE_DIR="$TOOLS/cache" UV_PYTHON_INSTALL_DIR="$TOOLS/python"
+export UV_HTTP_TIMEOUT=300 UV_CONCURRENT_DOWNLOADS=4
+export PYTHONNOUSERSITE=1 PYTHONHASHSEED=0 PYTHONUTF8=1 MPLBACKEND=Agg
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+export PATH="$TOOLS/bin:$PATH"
+# keep every temporary file on this disk, whose free space step 1 checks
+export TMPDIR="$TOOLS/tmp" TMP="$TOOLS/tmp" TEMP="$TOOLS/tmp"
+mkdir -p "$TMPDIR"
+
+# ---------------------------------------------------------------- helpers
+fetch() {  # fetch OUT URL [URL...]: download with retries, trying each mirror in turn
+  local out="$1"; shift
+  local url
+  for url in "$@"; do
+    for attempt in 1 2 3 4 5; do
+      rm -f "$out.part"
+      if command -v curl >/dev/null 2>&1; then
+        curl -fL --retry 5 --retry-delay 5 --connect-timeout 30 -o "$out.part" "$url" && { mv "$out.part" "$out"; return 0; }
+      elif command -v wget >/dev/null 2>&1; then
+        wget -q -O "$out.part" "$url" && { mv "$out.part" "$out"; return 0; }
+      else
+        die "neither curl nor wget is available to download files"
+      fi
+      printf 'download attempt %s from %s failed; retrying\n' "$attempt" "$url" >&2
+      sleep $((attempt * 5))
+    done
+  done
+  rm -f "$out.part"
+  return 1
+}
+
+sha256() {  # print the SHA-256 of a file with whatever tool the host has
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1" | awk '{print $1}'
+  elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 "$1" | awk '{print $NF}'
+  else die "no SHA-256 tool (sha256sum, shasum or openssl) found"; fi
+}
+
+verified_download() {  # verified_download OUT SHA URL [URL...]
+  local out="$1" want="$2"; shift 2
+  if [[ -f "$out" && "$(sha256 "$out")" == "$want" ]]; then return 0; fi
+  fetch "$out" "$@" || die "could not download $(basename "$out") from any mirror"
+  local got; got="$(sha256 "$out")"
+  [[ "$got" == "$want" ]] || { rm -f "$out"; die "$(basename "$out") failed its checksum (got $got)"; }
+}
+
+# ---------------------------------------------------------------- 1. preflight
+say "1/5 Checking this machine"
+OS="$(uname -s)"; ARCH="$(uname -m)"
+case "$OS-$ARCH" in
+  Darwin-arm64)               UV_TRIPLE="aarch64-apple-darwin";      UV_SHA="51c6170e8e3a01cef9f33b94f582b7b81ac65046f55d40afb35f9cff5a68c179" ;;
+  Darwin-x86_64)              UV_TRIPLE="x86_64-apple-darwin";       UV_SHA="5296d5aa2b9143360405eea866f8ef4d5dc8986b164eb0dc35e8f876a9304d30" ;;
+  Linux-x86_64)               UV_TRIPLE="x86_64-unknown-linux-gnu";  UV_SHA="173d95a0c32d18c896c46ba6fafbf3cf9c14ab74b033f81b76c883ef492a976b" ;;
+  Linux-aarch64|Linux-arm64)  UV_TRIPLE="aarch64-unknown-linux-gnu"; UV_SHA="9ff6b9d4665edcdd3a88dcc73cd1eb641754deb927f14e8c62ebfde6bf4f5f5e" ;;
+  *) die "unsupported platform $OS $ARCH (supported: macOS and Linux on x86_64 or ARM64)" ;;
+esac
+if [[ "$OS" == "Linux" ]]; then
+  glibc="$(getconf GNU_LIBC_VERSION 2>/dev/null | awk '{print $2}')"
+  if [[ -z "$glibc" ]] || [[ "$(printf '%s\n2.28\n' "$glibc" | sort -V | head -1)" != "2.28" ]]; then
+    die "this Linux has glibc ${glibc:-unknown}; the locked packages need glibc 2.28 or newer (see docs/portable_reproduction.md for the Apptainer route)"
+  fi
+fi
+
+if [[ "$OS" == "Darwin" ]]; then
+  CORES="$(sysctl -n hw.ncpu)"; MEM_MB=$(( $(sysctl -n hw.memsize) / 1048576 ))
+else
+  CORES="$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN)"
+  MEM_MB=$(( $(awk '/^MemTotal:/ {print $2}' /proc/meminfo) / 1024 ))
+  for f in /sys/fs/cgroup/memory.max /sys/fs/cgroup/memory/memory.limit_in_bytes; do   # container limits
+    if [[ -r "$f" ]] && lim="$(cat "$f")" && [[ "$lim" =~ ^[0-9]+$ ]] && (( lim / 1048576 < MEM_MB )); then
+      MEM_MB=$(( lim / 1048576 ))
+    fi
+  done
+fi
+CORES=${CORES:-1}
+# Use three quarters of RAM, but never less than the largest single job declares (16 GB),
+# so every job can be scheduled; jobs then run one at a time on small machines.
+JOB_MEM_MB=$(( MEM_MB * 3 / 4 ))
+(( JOB_MEM_MB < 16000 )) && JOB_MEM_MB=16000
+FREE_MB=$(df -Pm "$ROOT" | awk 'NR==2 {print $4}')
+NEED_MB=4000
+[[ -d "$ROOT/.venv" ]] && NEED_MB=2000
+(( FREE_MB >= NEED_MB )) || die "only $((FREE_MB / 1024)) GB free on this disk; about $((NEED_MB / 1024)) GB more is needed"
+(( MEM_MB >= 8000 )) || die "this machine has $((MEM_MB / 1024)) GB of RAM; at least 8 GB is needed"
+printf '%s %s, %s cores, %s GB RAM, %s GB free disk\n' "$OS" "$ARCH" "$CORES" "$((MEM_MB / 1024))" "$((FREE_MB / 1024))"
+
+# ---------------------------------------------------------------- 2. tools
+say "2/5 Installing pinned uv $UV_VERSION and Python $PYTHON_VERSION into .tools/ and .venv/"
+if [[ ! -x "$TOOLS/bin/uv" ]] || [[ "$("$TOOLS/bin/uv" --version 2>/dev/null | awk '{print $2}')" != "$UV_VERSION" ]]; then
+  tgz="$TOOLS/uv-$UV_TRIPLE.tar.gz"
+  verified_download "$tgz" "$UV_SHA" "https://github.com/astral-sh/uv/releases/download/$UV_VERSION/uv-$UV_TRIPLE.tar.gz"
+  rm -rf "$TOOLS/bin" "$TOOLS/uv-$UV_TRIPLE"
+  tar -xzf "$tgz" -C "$TOOLS"
+  mkdir -p "$TOOLS/bin"
+  mv "$TOOLS/uv-$UV_TRIPLE/uv" "$TOOLS/uv-$UV_TRIPLE/uvx" "$TOOLS/bin/"
+  rm -rf "$TOOLS/uv-$UV_TRIPLE" "$tgz"
+fi
+[[ "$(command -v uv)" == "$TOOLS/bin/uv" ]] || die "the pinned uv is not first on PATH"
+# A .venv made earlier by hand (other Python, other packages) or under another folder
+# path is replaced, never reused.
+if [[ -e "$ROOT/.venv" ]]; then
+  if [[ "$("$ROOT/.venv/bin/python" -c 'import platform; print(platform.python_version())' 2>/dev/null)" != "$PYTHON_VERSION" ]] \
+     || { [[ -f "$ROOT/.venv/bin/snakemake" ]] && ! grep -qF "$ROOT/.venv/bin/python" "$ROOT/.venv/bin/snakemake"; }; then
+    rm -rf "$ROOT/.venv"
+  fi
+fi
+for attempt in 1 2 3; do
+  uv sync --frozen >>"$LOG" 2>&1 && break
+  (( attempt == 3 )) && die "installing the locked Python packages failed (see $LOG)"
+  printf 'package install attempt %s failed; retrying with a fresh environment\n' "$attempt" >&2
+  rm -rf "$ROOT/.venv"; uv cache clean >>"$LOG" 2>&1 || true; sleep 10
+done
+uv cache prune >>"$LOG" 2>&1 || true   # keep only what the environment uses
+[[ "$(uv run python -c 'import platform; print(platform.python_version())')" == "$PYTHON_VERSION" ]] \
+  || die "the environment is not running Python $PYTHON_VERSION"
+uv run duckdb --version >/dev/null || die "the pinned DuckDB CLI is missing from the environment"
+
+# ---------------------------------------------------------------- 3. inputs
+say "3/5 Downloading and verifying the frozen inputs into inputs/"
+if uv run python -m regional_code_paper.reporting.input_manifest --config config/config.yaml \
+     --output results/provenance/input_manifest.json --validate-only >>"$LOG" 2>&1; then
+  echo "inputs already present and verified"
+else
+  rm -rf "$ROOT/inputs"
+  verified_download "$TOOLS/open-inputs.tar.gz" "$OPEN_INPUTS_SHA" "$OPEN_INPUTS_URL"
+  verified_download "$TOOLS/supplemental-inputs.zip" "$SUPP_INPUTS_SHA" "${SUPP_INPUTS_URLS[@]}"
+  uv run python - "$ROOT" "$TOOLS/open-inputs.tar.gz" "$TOOLS/supplemental-inputs.zip" <<'PY' >>"$LOG" 2>&1 \
+    || die "unpacking the input archives failed (see $LOG)"
+import sys, tarfile, zipfile
+from pathlib import Path
+root = Path(sys.argv[1]).resolve()
+with tarfile.open(sys.argv[2]) as t:
+    t.extractall(root, filter="data")
+with zipfile.ZipFile(sys.argv[3]) as z:
+    for name in z.namelist():
+        target = (root / name).resolve()
+        if root not in target.parents and target != root:
+            raise SystemExit(f"unsafe path in archive: {name}")
+    z.extractall(root)
+PY
+  uv run python -m regional_code_paper.reporting.input_manifest --config config/config.yaml \
+     --output results/provenance/input_manifest.json --validate-only >>"$LOG" 2>&1 \
+    || die "the downloaded inputs do not match reference/input_manifest.json (see $LOG and results/provenance/input_validation.json)"
+  rm -f "$TOOLS/open-inputs.tar.gz" "$TOOLS/supplemental-inputs.zip"
+  echo "all inputs verified against reference/input_manifest.json"
+fi
+
+# ---------------------------------------------------------------- 4. run
+say "4/5 Running the full workflow on $CORES cores (log: $LOG)"
+SNAKE=(uv run snakemake --snakefile workflow/Snakefile --profile profiles/local)
+"${SNAKE[@]}" --cores 1 --unlock all >>"$LOG" 2>&1 || true   # clear a lock left by an interrupted run
+if [[ ! -f "$TOOLS/fresh-start" ]]; then
+  # The repository ships retained results. Remove every workflow output once so that
+  # nothing is reused and every number is recomputed; later runs resume instead.
+  "${SNAKE[@]}" --cores 1 --delete-all-output all >>"$LOG" 2>&1 \
+    || die "clearing previous workflow outputs failed (see $LOG)"
+  rm -rf .snakemake results/work
+  touch "$TOOLS/fresh-start"
+fi
+KEEP_AWAKE=()   # stop a Mac from going to sleep mid-run (the run resumes anyway if it does)
+command -v caffeinate >/dev/null 2>&1 && KEEP_AWAKE=(caffeinate -i)
+${KEEP_AWAKE[@]+"${KEEP_AWAKE[@]}"} uv run snakemake --snakefile workflow/Snakefile --profile profiles/local \
+   --cores "$CORES" --resources "mem_mb=$JOB_MEM_MB" --scheduler greedy --rerun-incomplete --keep-going \
+   --printshellcmds all >>"$LOG" 2>&1 \
+  || die "a workflow step failed; the end of $LOG names it and its own log under results/logs/"
+
+# ---------------------------------------------------------------- 5. verdict
+say "5/5 Checking the audit"
+[[ -f results/audit/PASS ]] || die "the audit did not pass (see results/audit/reproduction_report.json)"
+uv run python - <<'PY'
+import json
+r = json.load(open("results/audit/reproduction_report.json"))
+assert r["computational_pass"], "audit reports failure"
+assert r["status"] == "reproduced", r["status"]
+for name, checks in sorted(r["checks"].items()):
+    passed = sum(bool(c.get("passed")) for c in checks)
+    assert passed == len(checks), f"{name}: {passed}/{len(checks)}"
+    print(f"  {name:22s} {passed}/{len(checks)} checks passed")
+PY
+trap - ERR
+printf '\nREPRODUCED. Every frozen scientific check passed.\n'
+printf 'Figures: results/figures/   Results: results/analysis/   Report: results/review/index.html\n'

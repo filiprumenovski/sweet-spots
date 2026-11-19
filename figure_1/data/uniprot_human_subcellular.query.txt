@@ -1,0 +1,2 @@
+https://rest.uniprot.org/uniprotkb/stream?format=tsv&fields=accession,cc_subcellular_location&query=%28organism_id%3A9606%29%20AND%20%28reviewed%3Atrue%29
+2026-11-17T20:00Z

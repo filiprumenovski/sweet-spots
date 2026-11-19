@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import gzip
+import hashlib
+import io
 import json
 import math
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from ..core.config import load_config
@@ -61,6 +65,59 @@ def table_checks(observed: pd.DataFrame, expected: pd.DataFrame, key: str) -> li
     return checks
 
 
+def archived_table(reference: Path, relative: str, digest: str) -> pd.DataFrame | None:
+    """Load the compressed archived copy of ``results/<relative>``.
+
+    The decompressed bytes must carry the archived SHA-256, so the copy is provably the
+    original x86 output rather than a regenerated file.
+    """
+    path = reference / "tables" / f"{relative}.gz"
+    if not path.is_file():
+        return None
+    data = gzip.decompress(path.read_bytes())
+    if hashlib.sha256(data).hexdigest() != digest:
+        raise ValueError(f"{path} does not decompress to the archived {relative}")
+    return pd.read_csv(io.BytesIO(data))
+
+
+def frame_equivalence(observed: pd.DataFrame, expected: pd.DataFrame) -> tuple[bool, float]:
+    """Same rows, columns and text; every number within the audit tolerances.
+
+    Floating-point results can differ in the last bit between CPU architectures
+    (for example x86 AVX2 and ARM64), so byte identity is recorded but not required.
+    """
+    if list(observed.columns) != list(expected.columns) or len(observed) != len(expected):
+        return False, math.inf
+    worst = 0.0
+    for column in expected.columns:
+        left, right = observed[column], expected[column]
+        if pd.api.types.is_numeric_dtype(left) and pd.api.types.is_numeric_dtype(right):
+            x, y = left.to_numpy(float), right.to_numpy(float)
+            if not np.allclose(x, y, rtol=1e-9, atol=1e-10, equal_nan=True):
+                return False, math.inf
+            finite = np.isfinite(x) & np.isfinite(y)
+            if finite.any():
+                worst = max(worst, float(np.abs(x[finite] - y[finite]).max()))
+        elif not left.equals(right):
+            return False, math.inf
+    return True, worst
+
+
+def file_check(results: Path, reference: Path, relative: str, digest: str) -> dict:
+    """Byte identity if possible, otherwise complete values against the archived copy."""
+    observed = sha256_file(results / relative)
+    check = {"path": relative, "expected": digest, "observed": observed,
+             "byte_identical": observed == digest}
+    if observed == digest:
+        return {**check, "method": "SHA-256", "passed": True}
+    archived = archived_table(reference, relative, digest)
+    if archived is None:
+        return {**check, "method": "SHA-256", "passed": False}
+    passed, worst = frame_equivalence(pd.read_csv(results / relative), archived)
+    return {**check, "method": "complete values (rtol=1e-9, atol=1e-10)",
+            "max_abs_diff": worst if math.isfinite(worst) else None, "passed": passed}
+
+
 def figure_checks(manifest_path: Path, project_root: Path) -> list[dict]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     expected = {
@@ -112,13 +169,7 @@ def build_report(project_root: Path, results: Path, reference: Path) -> dict:
         )
     fingerprints = json.loads((reference / "predictions.json").read_text())
     checks["predictions"] = [
-        {
-            "path": path,
-            "expected": digest,
-            "observed": sha256_file(results / path),
-            "passed": sha256_file(results / path) == digest,
-        }
-        for path, digest in fingerprints.items()
+        file_check(results, reference, path, digest) for path, digest in fingerprints.items()
     ]
     try:
         verify_manifest(

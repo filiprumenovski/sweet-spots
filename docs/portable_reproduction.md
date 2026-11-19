@@ -36,6 +36,25 @@ It refuses to write a manifest unless every scanner outer fold agrees with the
 archived table. The full audit then tests the recovered regional and nested
 scanner predictions against their original numerical references.
 
+## Other CPU architectures
+
+`./reproduce` was run from a fresh clone on an Apple M4 (ARM64, macOS) on 19 November
+2026. All 739 claim checks, 631 catalogue-sensitivity checks, 406 model-sensitivity
+checks, 19 figure checks and 75 editorial checks passed. Three large output tables
+(`scanner/outer_predictions.csv`, `regional_code/held_out_tiles.csv` and
+`self_clustering/per_protein.csv`) were not byte-identical to the x86 reference:
+1,668–3,559 values per table differed in the last bit (largest absolute difference
+1.1e-14), as expected from different floating-point hardware. Every row, identifier
+and label matched exactly.
+
+The audit therefore accepts either byte identity or complete-value equality with the
+same tolerances it already applies to every claim (`rtol=1e-9`, `atol=1e-10`). The
+comparison uses gzip copies of the archived tables in `reference/tables/`; each copy
+must decompress to the SHA-256 recorded in `reference/predictions.json` or the
+editorial manifest, so it is provably the original output. Whether each file was
+byte-identical, and its largest difference, are recorded in
+`results/audit/reproduction_report.json`.
+
 ## Older HPC hosts
 
 The locked scientific wheels need a modern Linux runtime. On Warrior's EL7

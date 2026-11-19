@@ -1,0 +1,41 @@
+{
+  "built_by": "build_figure_1_concept.py",
+  "canvas_viewbox": [
+    1500,
+    1050
+  ],
+  "png_pixels": [
+    3000,
+    2100
+  ],
+  "print_inches": [
+    10,
+    7
+  ],
+  "panel_A_structure": "PDB 7YEA full-length OGT homodimer (render_ogt_assembly.py); UDP and acceptor peptide from PDB 3PE4 superposed per protomer",
+  "panel_A_map": "data/substrate_map.json from compute_substrate_map.py (3,532 proteins with validated O-GlcNAc sites; UniProt reviewed human subcellular locations)",
+  "panel_A_reaction": "assets/chem_*.svg from render_chemistry.py (RDKit; stereo checked by CIP)",
+  "panel_B": "FOXK1 (P85037): AlphaFold AF-P85037-F1 v6 FHA (104-206) and forkhead (304-396) domains; full model with site markers; GlcNAc on Thr683 fitted from PDB 5UN8",
+  "panel_C_auroc": {
+    "h2r": {
+      "estimate": 0.8065612089584693,
+      "ci95": [
+        0.7677481780591642,
+        0.8426008963648411
+      ]
+    },
+    "r2h": {
+      "estimate": 0.8113448310305266,
+      "ci95": [
+        0.7985542598101216,
+        0.8234664753668065
+      ]
+    }
+  },
+  "panel_C_source": "manuscript_result_ledger.csv rows transfer.human_to_target.rice and transfer.rice_to_human.human (Figure 4A, Table S5)",
+  "carried_over_rasters": [
+    "Human",
+    "Rice"
+  ],
+  "carried_over_from": "assets/organisms/"
+}
