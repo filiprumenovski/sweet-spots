@@ -23,7 +23,7 @@ rule audit_report:
         regional=f"{RESULTS}/analysis/regional_code/held_out_tiles.csv",
         catalogue=f"{RESULTS}/analysis/region_definition_sensitivity/catalogue_grid.csv",
         models=f"{RESULTS}/analysis/region_definition_sensitivity/model_grid.csv",
-        reference=sorted(str(path) for path in Path("reference").glob("*")),
+        reference=sorted(str(path) for path in Path("reference").rglob("*") if path.is_file()),
     output:
         f"{RESULTS}/audit/reproduction_report.json",
     log:

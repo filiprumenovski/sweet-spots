@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from ..core.io import sha256_file
-from .audit import FIGURES, table_checks
+from .audit import FIGURES, file_check, table_checks
 
 
 def equal_values(left, right) -> bool:
@@ -84,6 +84,11 @@ def editorial_checks(project: Path, results: Path) -> list[dict]:
                     pd.read_csv(reference).reset_index(),
                 )
                 passed = all(c["passed"] for c in table_checks(actual, expected, "index"))
+        archived = project / "reference/tables" / f"{path.removeprefix('results/')}.gz"
+        if not same and file.is_file() and not reference.is_file() and archived.is_file():
+            relative = path.removeprefix("results/")
+            check = file_check(results, project / "reference", relative, digest)
+            passed, method = check["passed"], check["method"]
         checks.append(
             {"path": path, "method": method, "passed": passed, "byte_identical": same}
         )

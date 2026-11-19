@@ -65,7 +65,8 @@ and [Zenodo record 23330269](https://zenodo.org/records/23330269) contain
 paths. Its SHA-256 is
 `969b169a7be0b06c34ef93f694d0211d5d17c936edbdb5e7d9cf709b4c96d330`.
 The archive's availability does not change the provider terms listed above.
-It is not included by `make inputs`.
+It is not included by `make inputs`; `./reproduce` downloads and verifies it
+automatically (GitHub release, with the Zenodo record as a mirror).
 
 After obtaining the archive, verify and extract it from the repository root:
 

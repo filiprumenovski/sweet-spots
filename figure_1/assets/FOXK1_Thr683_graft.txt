@@ -1,0 +1,1 @@
+GlcNAc of PDB 5UN8 chain E (NAG 200 on Ser149) fitted onto FOXK1 Thr683 (AF-P85037 v6) by N/CA/CB/OG1; RMSD 0.41 A

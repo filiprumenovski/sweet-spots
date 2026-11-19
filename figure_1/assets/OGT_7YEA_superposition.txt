@@ -1,0 +1,3 @@
+3PE4 chain A superposed on 7YEA catalytic region (CA, resi >465)
+protomer A: RMSD 1.1 A over 504 atoms
+protomer B: RMSD 1.1 A over 504 atoms

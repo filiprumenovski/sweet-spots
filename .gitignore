@@ -25,3 +25,7 @@ results/benchmarks/
 results/review/
 results/audit/PASS
 results/provenance/input_validation.json
+.tools/
+
+# Figure 1 build outputs (submitted copies live in the manuscript package)
+figure_1/Figure_1_Concept_v2.*

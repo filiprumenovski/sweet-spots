@@ -1,10 +1,74 @@
 # Sweet spots
 
-[![Release: v1.0.4](https://img.shields.io/badge/release-v1.0.4-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.0.4)
+[![Release: v1.1.0](https://img.shields.io/badge/release-v1.1.0-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.1.0)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21922595.svg)](https://doi.org/10.5281/zenodo.21922595)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
+
+## Reproduce everything with one command
+
+Open a terminal on a Mac or Linux computer and paste:
+
+```bash
+git clone https://github.com/filiprumenovski/sweet-spots.git
+cd sweet-spots
+./reproduce
+```
+
+Then wait. When it finishes, the last line says:
+
+```text
+REPRODUCED. Every frozen scientific check passed.
+```
+
+That's all. You do not need to install Python, set up an environment, or download
+any data. The script fetches everything itself, checks every download, recomputes
+every result from scratch, and compares each number with the published values.
+
+| | |
+|---|---|
+| **You need** | macOS or Linux, an internet connection, 8 GB of RAM, 4 GB of free disk |
+| **How long** | about 77 minutes on a 10-core laptop; about 20 minutes on a 96-core server (see below) |
+| **If it stops** | run `./reproduce` again; it picks up where it left off |
+| **If it fails** | it prints which step failed; details are in `results/logs/reproduce.log` |
+| **Results** | figures in `results/figures/`, numbers in `results/analysis/`, full report in `results/review/index.html` |
+| **To start over** | delete the folder and clone again |
+| **Windows** | not supported directly; use WSL 2 with Ubuntu and run the same three lines there |
+| **No `git`?** | download the [ZIP](https://github.com/filiprumenovski/sweet-spots/archive/refs/heads/main.zip), unzip it, open a terminal in the folder and run `bash reproduce` |
+
+### Expected run time
+
+| Computer | Time |
+|---|---|
+| Laptop, 10 cores (Apple M4) | about 77 minutes |
+| Server, 96 cores (AMD EPYC) | about 20 minutes |
+
+Fewer cores take proportionally longer. Running it again after it finishes takes a
+minute or two.
+
+<details>
+<summary>What the command does, step by step</summary>
+
+1. Checks the computer (operating system, cores, memory, disk).
+2. Downloads a pinned copy of `uv` and Python 3.12.13 into `.tools/`, verifies their
+   checksums, and installs every package at the exact version in `uv.lock` into
+   `.venv/`. Python, conda or uv settings already on the computer are ignored.
+3. Downloads all input data (the open-data release and the supplemental archive, with
+   Zenodo as a backup source) and checks every file against
+   `reference/input_manifest.json`.
+4. Deletes the retained results and recomputes all analyses, figures and tables using
+   every CPU core.
+5. Runs the audit: every reported number, sensitivity row, prediction table and figure
+   is compared with the archived reference. It prints `REPRODUCED` and writes
+   `results/audit/PASS` only if every check passes.
+
+Nothing is installed outside the `sweet-spots` folder. Older HPC systems (glibc older
+than 2.28) can use Apptainer instead; see [portable reproduction](docs/portable_reproduction.md).
+
+</details>
+
+## About
 
 Reproducible analyses for *Sweet spots: how a promiscuous glycosyltransferase
 reads a conserved regional code*.
@@ -20,40 +84,17 @@ in the [region definition guide](docs/region_definition.md).
   <img src="results/figures/Figure_1.png" width="100%" alt="O-GlcNAc sites form reproducible regional clusters across proteins and spatial scales">
 </p>
 
-## Quick start
+## Running individual steps
 
-Requirements are Python 3.12, [uv](https://docs.astral.sh/uv/), and a POSIX
-shell on macOS or a modern Linux distribution (glibc 2.28 or newer). The DuckDB
-CLI, Snakemake, and all Python dependencies are pinned in `uv.lock`. Older HPC
-hosts can run the locked environment inside Apptainer; see
-[portable reproduction](docs/portable_reproduction.md).
+The `make` targets remain for development (they expect `uv` on `PATH`):
 
 ```bash
-git clone https://github.com/filiprumenovski/sweet-spots.git
-cd sweet-spots
-make install
-make inputs
-```
-
-`make inputs` downloads and verifies the 127 MB open-data release. Three additional
-inputs are installed separately. The existing supplemental archive, exact
-locations, hashes, and provider terms are described in the
-[input data guide](docs/input_data.md#supplemental-archive).
-
-Once the complete `inputs/` tree is present:
-
-```bash
+make install          # locked environment
+make inputs           # open inputs only; see the input data guide for the rest
 make validate-inputs  # record every input digest
 make dry-run          # inspect the complete execution plan
 make reproduce        # run all analyses, figures, tables, and audits
 make review           # openable HTML review of every claim, figure and source
-```
-
-The workstation profile uses four cores and a 32 GB aggregate memory ceiling.
-For larger systems, pass Snakemake options through `SNAKEMAKE_ARGS`:
-
-```bash
-make reproduce SNAKEMAKE_ARGS="--cores 16 --resources mem_mb=96000"
 ```
 
 The included SLURM profile submits independent shards while respecting each
@@ -102,6 +143,7 @@ seeds, or numerical results. The full contract is described in the
 sweet-spots/
 ├── config/                 validated scientific and execution parameters
 ├── docs/                   data, methods, and architecture documentation
+├── figure_1/               Figure 1 concept figure build (see figure_1/README.md)
 ├── profiles/               local and SLURM execution profiles
 ├── results/                retained analyses, figures, tables, and audit
 ├── scripts/                input installation utilities
