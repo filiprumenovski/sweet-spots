@@ -6,9 +6,11 @@ authors:
   - family-names: Rumenovski
     given-names: Filip
     affiliation: "Department of Chemistry, Wayne State University"
+    orcid: "https://orcid.org/0009-0005-1552-2826"
   - family-names: Fehl
     given-names: Charlie
     affiliation: "Department of Chemistry, Wayne State University"
+    orcid: "https://orcid.org/0000-0001-6182-0879"
 repository-code: "https://github.com/filiprumenovski/sweet-spots"
 doi: "10.5281/zenodo.21922595"
 url: "https://doi.org/10.5281/zenodo.21922595"
