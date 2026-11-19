@@ -32,30 +32,26 @@ Install the archive with `scripts/fetch_open_inputs.sh`. The script downloads
 the fixed release URL, verifies its digest before extraction, and never silently
 substitutes a newer database release.
 
-## User-supplied inputs
+## Supplemental inputs (CC BY-NC-SA 4.0)
 
-These files are part of the exact scientific contract and are excluded from the
-open input bundle. The provider restrictions recorded for them are:
+Three files of the scientific contract come from third-party resources and are distributed
+separately from the open input bundle, in the supplemental archive below, under the
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+The repository's code remains MIT.
 
-| Required path | Bytes | SHA-256 | Reason excluded from open bundle |
+| Required path | Bytes | SHA-256 | Source |
 |---|---:|---|---|
-| `analysis/revalidation/data/atlas_unambiguous.csv` | 7,444,780 | `7ea5e1351f71605fae0e7556184845dbb10d4b1acb6bb3f44db9024b8fb3f95e` | O-GlcNAcAtlas provides a public bulk download but states no explicit redistribution license. |
-| `data/external/multispecies_oglcnac/rice_sequences.fasta` | 492,827 | `4891f26934f25d69d7e9fa3f85a80197b235068cc27d809bdbecc13d053dfd8d` | MSU/RGAP provides sequence downloads but states no explicit redistribution license. |
-| `data/processed/landscape/ptm_unified.parquet` | 6,316,870 | `2a5fc9b2cdc3ac2b61423a83c734346fe7d016b1d6d93c21fcb59162abedff57` | Contains 230,303 records from the PhosphoSitePlus release of 16 February 2024 (PSP_v6-7-4), distributed under CC BY-NC-SA 3.0 before PhosphoSitePlus moved to a formal license agreement; those non-commercial, share-alike terms differ from the open bundle's license. |
+| `analysis/revalidation/data/atlas_unambiguous.csv` | 7,444,780 | `7ea5e1351f71605fae0e7556184845dbb10d4b1acb6bb3f44db9024b8fb3f95e` | O-GlcNAcAtlas Dataset I ([download page](https://oglcnac.org/atlas/download/)) |
+| `data/external/multispecies_oglcnac/rice_sequences.fasta` | 492,827 | `4891f26934f25d69d7e9fa3f85a80197b235068cc27d809bdbecc13d053dfd8d` | MSU/RGAP protein sequences ([download interface](https://rice.uga.edu/downloads_gad.shtml)) |
+| `data/processed/landscape/ptm_unified.parquet` | 6,316,870 | `2a5fc9b2cdc3ac2b61423a83c734346fe7d016b1d6d93c21fcb59162abedff57` | dbPTM, ODB and PhosphoSitePlus® (www.phosphosite.org) records; see below |
 
-O-GlcNAcAtlas Dataset I is available from its official
-[download page](https://oglcnac.org/atlas/download/). MSU/RGAP protein sequences
-are available through its official
-[download interface](https://rice.uga.edu/downloads_gad.shtml).
-Current PhosphoSitePlus releases are available only under a formal license agreement, requested through its official
-[licensing page](https://www.phosphosite.org/staticLicensing). The repository
-contains no credentials, licensed source records, or mechanism that bypasses
-provider access controls.
+The unified PTM parquet contains:
+- 41,615 dbPTM acetylation records
+- 16,418 ODB O-GlcNAc records
+- 230,303 PhosphoSitePlus phosphorylation records
+- 62,673 dbPTM ubiquitination records
 
-The unified PTM parquet contains 41,615 dbPTM acetylation records, 16,418 ODB
-O-GlcNAc records, 230,303 PhosphoSitePlus phosphorylation records, and 62,673
-dbPTM ubiquitination records. Because those records share one analysis-ready
-file, the entire parquet is treated as restricted.
+The PhosphoSitePlus records come from the release of 16 February 2024 (PSP_v6-7-4), distributed under CC BY-NC-SA 3.0 before PhosphoSitePlus moved to a formal license agreement. Its share-alike terms carry over to this archive. Users of these records must cite Hornbeck et al., Nucleic Acids Res. 43, D512–D520 (2015). Current PhosphoSitePlus releases require a formal license agreement ([licensing page](https://www.phosphosite.org/staticLicensing)).
 
 ## Supplemental archive
 
@@ -64,7 +60,7 @@ and [Zenodo record 23330269](https://zenodo.org/records/23330269) contain
 `sweet-spots-input-data-v1.zip`, with the three files at their required `inputs/`
 paths. Its SHA-256 is
 `969b169a7be0b06c34ef93f694d0211d5d17c936edbdb5e7d9cf709b4c96d330`.
-The archive's availability does not change the provider terms listed above.
+The archive is distributed under CC BY-NC-SA 4.0.
 It is not included by `make inputs`; `./reproduce` downloads and verifies it
 automatically (GitHub release, with the Zenodo record as a mirror).
 
@@ -79,7 +75,7 @@ uv run --frozen python -m zipfile -e sweet-spots-input-data-v1.zip .
 
 ## Verification
 
-After adding the three user-supplied files, verify the complete tree before
+After adding the three supplemental files, verify the complete tree before
 launching any analysis:
 
 ```bash
