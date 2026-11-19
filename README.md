@@ -1,10 +1,16 @@
 # Sweet spots
 
-[![Release: v1.1.0](https://img.shields.io/badge/release-v1.1.0-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.1.0)
+[![Release: v1.1.1](https://img.shields.io/badge/release-v1.1.1-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.1.1)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21922595.svg)](https://doi.org/10.5281/zenodo.21922595)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
+
+Code and data for *Regional sequence composition predicts O-GlcNAc organization
+across species* (Rumenovski and Fehl, submitted to Cell Systems). The workflow
+rebuilds the O-GlcNAc region catalog, every computational analysis and figure,
+the result ledger, and an audit that checks each reported value against the
+archived results.
 
 ## Reproduce everything with one command
 
@@ -63,148 +69,36 @@ minute or two.
    is compared with the archived reference. It prints `REPRODUCED` and writes
    `results/audit/PASS` only if every check passes.
 
-Nothing is installed outside the `sweet-spots` folder. Older HPC systems (glibc older
-than 2.28) can use Apptainer instead; see [portable reproduction](docs/portable_reproduction.md).
+Nothing is installed outside the `sweet-spots` folder.
 
 </details>
 
-## About
+## What is where
 
-Reproducible analyses for *Sweet spots: how a promiscuous glycosyltransferase
-reads a conserved regional code*.
-
-This repository rebuilds the operational O-GlcNAc region catalogue, every
-reported computational analysis, five main and four supplemental figures, a
-machine-readable result ledger, and the terminal integrity audit. Retained
-results are included for immediate inspection; the Snakemake workflow recreates
-them from frozen inputs. The two-stage region construction is defined precisely
-in the [region definition guide](docs/region_definition.md).
-
-<p align="center">
-  <img src="results/figures/Figure_1.png" width="100%" alt="O-GlcNAc sites form reproducible regional clusters across proteins and spatial scales">
-</p>
-
-## Running individual steps
-
-The `make` targets remain for development (they expect `uv` on `PATH`):
-
-```bash
-make install          # locked environment
-make inputs           # open inputs only; see the input data guide for the rest
-make validate-inputs  # record every input digest
-make dry-run          # inspect the complete execution plan
-make reproduce        # run all analyses, figures, tables, and audits
-make review           # openable HTML review of every claim, figure and source
-```
-
-The included SLURM profile submits independent shards while respecting each
-rule's declared CPU, memory, disk, and runtime requirements:
-
-```bash
-uv run snakemake --snakefile workflow/Snakefile --profile profiles/slurm
-```
-
-## Outputs
-
-All generated products live below `results/`; source inputs are treated as
-immutable.
-
-| Product | Description |
+| Path | Contents |
 |---|---|
-| [`results/analysis/`](results/analysis/) | Transparent CSV and JSON output from each analysis |
-| [`results/analysis/region_definition_sensitivity/`](results/analysis/region_definition_sensitivity/) | Complete 45-definition catalogue grid and 15 protein-grouped model refits |
-| [`results/figures/`](results/figures/) | Vector PDF and 400 dpi PNG for every retained figure |
-| [`results/tables/manuscript_result_ledger.parquet`](results/tables/manuscript_result_ledger.parquet) | One row per reported estimand, materialized with DuckDB |
-| [`results/provenance/input_manifest.json`](results/provenance/input_manifest.json) | File hashes and directory-tree hashes for every frozen input |
-| [`results/audit/reproduction_report.json`](results/audit/reproduction_report.json) | Final numerical and figure-integrity checks |
+| `workflow/`, `src/`, `config/` | Snakemake workflow, analysis code and parameters |
+| `results/` | Retained analyses, tables, figures and audit (`./reproduce` recomputes them) |
+| `reference/` | Archived values the audit compares against |
+| `assets/review_figures/` | Designed figures; review 1–5 are paper Figures 2–6, review S1, S4, S3, S2 are paper Figures S1–S4 |
+| `figure_1/` | Build for paper Figure 1 ([instructions](figure_1/README.md)) |
+| `docs/input_data.md` | Input sources, versions, checksums and licenses |
 
-The retained audit reports `reproduced`; the figure manifest records the byte
-size and SHA-256 digest of every rendered PDF and PNG.
+For development, `make check` runs the linter, unit tests and lockfile check, and
+`make dry-run` prints the full execution plan. `profiles/slurm` runs the same
+workflow on a SLURM cluster.
 
-## Reproducibility design
+## Licenses
 
-- Protein-grouped outer folds isolate model assessment from model selection and
-  threshold calibration.
-- Protein-level bootstrap and permutation procedures preserve the biological
-  unit of inference.
-- Expensive simulations, kinase scoring, and model fitting use deterministic
-  map/reduce shards that can be resumed safely.
-- Writers commit atomically; reducers reject missing shards, duplicate keys,
-  schema drift, altered digests, and incomplete fold coverage.
-- Figures consume declared workflow products rather than transcribed values.
+The code is MIT-licensed. The supplemental input archive
+([Zenodo 23330269](https://doi.org/10.5281/zenodo.23330269)) is distributed under
+CC BY-NC-SA 4.0; sources and attribution are listed in
+[docs/input_data.md](docs/input_data.md).
 
-Changing the number of shards changes scheduling, not record ownership, random
-seeds, or numerical results. The full contract is described in the
-[workflow architecture](docs/architecture.md).
+## Citation
 
-## Repository map
-
-```text
-sweet-spots/
-├── config/                 validated scientific and execution parameters
-├── docs/                   data, methods, and architecture documentation
-├── figure_1/               Figure 1 concept figure build (see figure_1/README.md)
-├── profiles/               local and SLURM execution profiles
-├── results/                retained analyses, figures, tables, and audit
-├── scripts/                input installation utilities
-├── src/regional_code_paper/
-│   ├── analysis/           scientific estimands
-│   ├── core/               configuration, randomness, and atomic I/O
-│   ├── execution/          restartable map/reduce commands
-│   ├── models/             features and grouped predictive models
-│   ├── reporting/          figures, manifests, ledgers, and audits
-│   └── sql/                declarative DuckDB analyses
-├── tests/unit/             focused numerical and workflow-contract tests
-└── workflow/               Snakemake DAG and domain-specific rules
-```
-
-## Documentation
-
-| Guide | Contents |
-|---|---|
-| [Input data](docs/input_data.md) | Frozen data contract, licenses, hashes, and installation |
-| [Region definition](docs/region_definition.md) | Strict core membership, final grouping, coordinates, and a worked example |
-| [Workflow architecture](docs/architecture.md) | Parallel execution, determinism, and failure behavior |
-| [Clustering breadth](docs/clustering_breadth.md) | Estimands, conditioned null, and inferential guardrails |
-| [Execution profiles](profiles/README.md) | Workstation and SLURM configuration |
-| [Result archive](results/README.md) | Structure of the retained computational products |
-
-## Development
-
-```bash
-make check
-```
-
-This runs Ruff, unit and synthetic integration tests, and the lockfile consistency check. See
-[CONTRIBUTING.md](CONTRIBUTING.md) for the review contract.
-
-## Authors and affiliation
-
-- **Filip Rumenovski** — lead author
-- **Charlie Fehl** — principal investigator
-
-Department of Chemistry, Wayne State University. See [AUTHORS.md](AUTHORS.md)
-for the canonical project authorship record.
-
-## Citation and license
-
-Use the repository's `CITATION.cff` metadata or GitHub's **Cite this repository**
-menu to cite this software. The versioned archive series is collected under the
-[concept DOI](https://doi.org/10.5281/zenodo.21922595), which resolves to the
-latest deposited release while preserving every earlier version.
-
-The analysis code is available under the [MIT License](LICENSE). Input data
-retain the licenses and access conditions of their original providers; see the
-[data provenance and licensing table](docs/input_data.md).
-
-## Reviewing a reproduction
-
-Run `make review`, then open `results/review/index.html`. The report compares all
-82 claims and their confidence intervals, both sensitivity tables, complete
-prediction-table fingerprints, generated figures, and the selected revised
-editorial figure set. It includes the actual workflow graph and source links
-for all 41 revised panels. Retained artwork is explicitly identified.
-
-[Reviewer workflow and scope](docs/review.md) explains the immutable baseline,
-CI coverage, failure reports, and the distinction between regenerated analysis
-figures and retained editorial exports.
+Cite this software through `CITATION.cff` (GitHub's **Cite this repository**) or the
+[concept DOI](https://doi.org/10.5281/zenodo.21922595), which resolves to the latest
+release. Authors: Filip Rumenovski ([ORCID](https://orcid.org/0009-0005-1552-2826))
+and Charlie Fehl ([ORCID](https://orcid.org/0000-0001-6182-0879)), Department of
+Chemistry, Wayne State University.

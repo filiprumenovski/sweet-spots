@@ -122,7 +122,7 @@ esac
 if [[ "$OS" == "Linux" ]]; then
   glibc="$(getconf GNU_LIBC_VERSION 2>/dev/null | awk '{print $2}')"
   if [[ -z "$glibc" ]] || [[ "$(printf '%s\n2.28\n' "$glibc" | sort -V | head -1)" != "2.28" ]]; then
-    die "this Linux has glibc ${glibc:-unknown}; the locked packages need glibc 2.28 or newer (see docs/portable_reproduction.md for the Apptainer route)"
+    die "this Linux has glibc ${glibc:-unknown}; the locked packages need glibc 2.28 or newer"
   fi
 fi
 
