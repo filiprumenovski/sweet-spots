@@ -16,14 +16,14 @@ cd sweet-spots
 ./reproduce
 ```
 
-Then wait. When it finishes, the last line says:
+When the run finishes, its last line says:
 
 ```text
 REPRODUCED. Every frozen scientific check passed.
 ```
 
-That's all. You do not need to install Python, set up an environment, or download
-any data. The script fetches everything itself, checks every download, recomputes
+You do not need to install Python, set up an environment or download any data:
+the script fetches everything itself, checks every download, recomputes
 every result from scratch, and compares each number with the published values.
 
 | | |
