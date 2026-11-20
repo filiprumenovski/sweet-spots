@@ -6,8 +6,8 @@
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
-Code and data for *Regional sequence composition predicts O-GlcNAc organization
-across species* (Rumenovski and Fehl, submitted to Cell Systems). The workflow
+Code and data for *Sweet spots: regional sequence composition predicts where a
+promiscuous glycosyltransferase acts* (Rumenovski and Fehl, submitted to Cell Systems). The workflow
 rebuilds the O-GlcNAc region catalog, every computational analysis and figure,
 the result ledger, and an audit that checks each reported value against the
 archived results.
