@@ -33,6 +33,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from despace import despace
+
 HERE = Path(__file__).resolve().parent
 ORGANISMS = HERE / "assets/organisms"   # human and rice drawings carried over from the earlier Figure 1 assembly
 OUT = HERE / "Figure_1_Concept_v2"
@@ -93,10 +95,13 @@ def glcnac(x, y, s=11):
 
 
 # ---------------------------------------------------------------- shared style
-# 1500 x 1050 units print at 10 x 7 in, so 1 unit = 0.48 pt.
-LETTER = 26      # ~12.5 pt bold panel letters
-LABEL = 15       # ~7.2 pt
-SMALL = 13       # ~6.2 pt
+# 1500 x 1050 units print at 174 x 121.8 mm (Cell Press full width), so 1 unit = 0.3288 pt.
+# Type scale shared with Figures 2-6: letters 8 pt bold, titles 7 pt, labels 6.5 pt, annotations 6 pt.
+PT = 1 / 0.32882
+LETTER = round(8.0 * PT, 2)
+TITLE = round(7.0 * PT, 2)
+LABEL = round(6.5 * PT, 2)
+SMALL = round(6.0 * PT, 2)
 
 # Grid: column A x 28-640, column B/C x 700-1472; top 36, bottom 1026.
 # Panel C and the substrate map in A share one baseline (ROW2).
@@ -115,7 +120,7 @@ COMPARTMENTS = [  # key in substrate_map.json, label, colour
     ("nucleus", "Nucleus", "#2f5d9e"),
     ("nucleocytoplasmic", "Nucleus and cytoplasm", "#5e8fc8"),
     ("cytoplasm", "Cytoplasm", "#2a8a8f"),
-    ("membranes & secretory", "Membranes and secretory", "#7a62b8"),
+    ("membranes & secretory", "Membrane/secretory", "#7a62b8"),
     ("mitochondria", "Mitochondria", "#c47f17"),
     ("not annotated", "Not annotated", "#9fb0bb"),
 ]
@@ -157,13 +162,13 @@ def panel_a(dimer: Image.Image) -> list[str]:
     mid = (a0 + a1) / 2
     o.append(f'<path d="M{a0:.1f} {ay:.1f} L{a1:.1f} {ay:.1f}" stroke="{ARROW}" stroke-width="1.8" '
              f'fill="none" marker-end="url(#arrow)"/>')
-    o.append(text(mid, ay + 20, "OGT", LABEL))
+    o.append(text(mid, ay + 23, "OGT", LABEL))
     o.append(f'<path d="M{a0 + 10:.1f} {ay - 34:.1f} Q{mid:.1f} {ay + 4:.1f} {a1 - 10:.1f} {ay - 34:.1f}" '
              f'stroke="{ARROW}" stroke-width="1.2" fill="none" marker-end="url(#arrowsm)"/>')
     o.append(text(a0 + 4, ay - 40, "UDP-GlcNAc", SMALL, "start"))
     o.append(text(a1 - 4, ay - 40, "UDP", SMALL, "end"))
-    o.append(text(L + 12 + aw / 2, ry0 + 4 + ah + 16, "Ser", LABEL))
-    o.append(text(px + pw / 2, ry0 + ph + 14, "O-GlcNAc-Ser", LABEL))
+    o.append(text(L + 12 + aw / 2, ry0 + 4 + ah + 20, "Ser", LABEL))
+    o.append(text(px + pw / 2, ry0 + ph + 19, "O-GlcNAc-Ser", LABEL))
     gx, gy = px + pw + 14, ry0 + ph * 0.66
     o.append(glcnac(gx, gy, 14))
     o.append(text(gx + 12, gy + 5, "GlcNAc", SMALL, "start"))
@@ -173,7 +178,7 @@ def panel_a(dimer: Image.Image) -> list[str]:
     sm = json.loads((HERE / "data/substrate_map.json").read_text())
     o.append(letter(L, ROW2, "B"))
     head_b = f"OGT, one enzyme with {sm['n_proteins']:,} human substrates"
-    o.append(text(L + 30, ROW2, head_b, LABEL, "start"))
+    o.append(text(L + 30, ROW2, head_b, TITLE, "start"))
     k = 0.555
     g = sm["groups"]
 
@@ -191,50 +196,51 @@ def panel_a(dimer: Image.Image) -> list[str]:
                     out.append(f'<circle cx="{ccx + c["x"] * k:.2f}" cy="{ccy + c["y"] * k:.2f}" r="{c["r"] * k:.2f}"/>')
             out.append("</g>")
         out.append(text(ccx, ly, label, SMALL))
-        out.append(text(ccx, ly + 15, f'{grp["n_proteins"]:,} ({grp["n_mapped"]:,} mapped)', SMALL, fill=MUTED))
+        out.append(text(ccx, ly + 20, f'{grp["n_proteins"]:,} ({grp["n_mapped"]:,})', SMALL, fill=MUTED))
         return out
 
-    r = {key: g[key]["extent"] * k for key, _, _ in COMPARTMENTS}
-    # each row ordered largest to smallest cluster
-    row1 = sorted(COMPARTMENTS[:3], key=lambda c: -r[c[0]])
-    row2 = sorted(COMPARTMENTS[3:], key=lambda c: -r[c[0]])
-    gap = 22.0
-    # row 1: the three large clusters, centred in the column
-    m1 = max(r[key] for key, _, _ in row1)
+    count = lambda key: f'{g[key]["n_proteins"]:,} ({g[key]["n_mapped"]:,})'
+    key_w, gap = 128.0, 16.0
+    colw = R - L
+    def layout(k):
+        r = {key: g[key]["extent"] * k for key, _, _ in COMPARTMENTS}
+        slot = {key: max(2 * r[key], text_w(label, SMALL), text_w(count(key), SMALL)) for key, label, _ in COMPARTMENTS}
+        row1 = sorted(COMPARTMENTS[:3], key=lambda c: -r[c[0]])
+        row2 = sorted(COMPARTMENTS[3:], key=lambda c: -r[c[0]])
+        w1 = sum(slot[c[0]] for c in row1) + gap * (len(row1) - 1)
+        w2 = sum(slot[c[0]] for c in row2) + key_w + gap * len(row2)
+        m1 = max(r[c[0]] for c in row1); m2 = max(r[c[0]] for c in row2)
+        bottom = ROW2 + 14 + 2 * m1 + 19 + 36 + 2 * m2 + 19 + 20
+        return r, slot, row1, row2, w1, w2, m1, m2, bottom
+    k = 0.555
+    while True:
+        r, slot, row1, row2, w1, w2, m1, m2, bottom = layout(k)
+        if max(w1, w2) <= colw and bottom <= 1040: break
+        k -= 0.005
     cy1 = ROW2 + 14 + m1
-    ly1 = cy1 + m1 + 15
-    w1 = sum(2 * r[key] for key, _, _ in row1) + gap * (len(row1) - 1)
+    ly1 = cy1 + m1 + 19
     x = (L + R) / 2 - w1 / 2
     for key, label, col in row1:
-        x += r[key]
-        o += cluster(key, label, col, x, cy1, ly1)
-        x += r[key] + gap
-    # row 2: three small clusters plus the size key, packed and centred
-    m2 = max(r[key] for key, _, _ in row2)
-    cy2 = ly1 + 26 + m2
-    ly2 = cy2 + m2 + 15
-    widths = [max(2 * r[key], text_w(label, SMALL) * 0.92,
-                  text_w(f'{g[key]["n_proteins"]:,} ({g[key]["n_mapped"]:,} mapped)', SMALL) * 0.92)
-              for key, label, _ in row2]
-    key_w = 104.0
-    gap2 = 18.0
-    w2 = sum(widths) + key_w + gap2 * len(row2)
+        o += cluster(key, label, col, x + slot[key] / 2, cy1, ly1)
+        x += slot[key] + gap
+    cy2 = ly1 + 36 + m2
+    ly2 = cy2 + m2 + 19
     x = (L + R) / 2 - w2 / 2
-    for (key, label, col), w in zip(row2, widths):
-        o += cluster(key, label, col, x + w / 2, cy2, ly2)
-        x += w + gap2
+    for key, label, col in row2:
+        o += cluster(key, label, col, x + slot[key] / 2, cy2, ly2)
+        x += slot[key] + gap
     kx = x + 14
     ky = cy2 + m2 - 2
     o.append(text(x + key_w / 2, ly2, "Mapped sites", SMALL))
-    for n, dxk in ((0, -4), (1, 14), (10, 38), (100, 76)):
+    for n, dxk in ((0, -8), (1, 16), (10, 44), (100, 84)):
         rr = 1.45 * math.sqrt(max(n, 1)) * k
         if n == 0:
             o.append(f'<circle cx="{kx + dxk:.1f}" cy="{ky - rr:.1f}" r="{rr:.2f}" fill="#a9b5be"/>')
         else:
             o.append(f'<circle cx="{kx + dxk:.1f}" cy="{ky - rr:.1f}" r="{rr:.2f}" fill="none" '
                      f'stroke="{INK}" stroke-width="0.9"/>')
-        o.append(text(kx + dxk, ly2 + 15, str(n), SMALL, fill=MUTED))
-    print("panel B bottom", round(ly2 + 15), "row2 width", round(w2))
+        o.append(text(kx + dxk, ly2 + 20, str(n), SMALL, fill=MUTED))
+    print("panel B bottom", round(ly2 + 20), "rows", round(w1), round(w2), "of", round(colw), "k", round(k, 3))
     return o
 
 
@@ -266,12 +272,12 @@ def protein_track(o: list[str], y0: float) -> None:
     """Residue track of the panel B protein (same protein as the drawing above)."""
     t = json.loads((HERE / f"data/{GENE_B}_track.json").read_text())
     L, R = COL_R
-    tx0, tx1 = L + 92, R - 6
+    tx0, tx1 = L + 110, R - 6
     n = t["length"]
     X = lambda p: tx0 + (p - 1) / (n - 1) * (tx1 - tx0)
     dy = 24.0
     top = y0 + 14
-    o.append(text(L, y0, f'{t["gene"]} ({t["accession"]}), {n} aa', LABEL, "start"))
+    o.append(text(L, y0, f'{t["gene"]} ({t["accession"]}), {n} aa', TITLE, "start"))
     for a, b in t["regions"]:
         o.append(f'<rect x="{X(a) - 2:.1f}" y="{top + dy - 4:.1f}" width="{X(b) - X(a) + 4:.1f}" '
                  f'height="{dy * 2 + 2:.1f}" fill="{REGION_NAVY}" fill-opacity="0.18"/>')
@@ -280,8 +286,8 @@ def protein_track(o: list[str], y0: float) -> None:
     o.append(f'<line x1="{tx0}" y1="{yy:.1f}" x2="{tx1}" y2="{yy:.1f}" stroke="{CHAIN}" stroke-width="2"/>')
     o.append(text(tx0 - 10, yy + 4.5, "Domains", SMALL, "end"))
     for name, a, b in DOMAINS_B:
-        o.append(f'<rect x="{X(a):.1f}" y="{yy - 8:.1f}" width="{X(b) - X(a):.1f}" height="16" rx="3" fill="#2a8c8f"/>')
-        o.append(f'<text x="{(X(a) + X(b)) / 2:.1f}" y="{yy + 4.5:.1f}" font-size="{SMALL - 1}" '
+        o.append(f'<rect x="{X(a):.1f}" y="{yy - 11:.1f}" width="{X(b) - X(a):.1f}" height="22" rx="3" fill="#2a8c8f"/>')
+        o.append(f'<text x="{(X(a) + X(b)) / 2:.1f}" y="{yy + 6:.1f}" font-size="{SMALL}" '
                  f'text-anchor="middle" fill="white">{name}</text>')
     for name, pos, col, i in (("Ser/Thr", t["st"], "#9aa7b0", 1), ("O-GlcNAc", t["oglcnac"], GLCNAC_EDGE, 2)):
         yy = top + i * dy + dy / 2
@@ -294,7 +300,7 @@ def protein_track(o: list[str], y0: float) -> None:
     o.append(f'<line x1="{tx0}" y1="{ay:.1f}" x2="{tx1}" y2="{ay:.1f}" stroke="{ARROW}" stroke-width="1"/>')
     for p in (1, 100, 200, 300, 400, 500, 600, n):
         o.append(f'<line x1="{X(p):.1f}" y1="{ay:.1f}" x2="{X(p):.1f}" y2="{ay + 4:.1f}" stroke="{ARROW}" stroke-width="1"/>')
-        o.append(text(X(p), ay + 16, str(p), SMALL))
+        o.append(text(X(p), ay + 20, str(p), SMALL))
 
 
 def panel_b(assets: dict[str, str], pep: Image.Image) -> list[str]:
@@ -358,8 +364,8 @@ def panel_c(assets: dict[str, str]) -> list[str]:
              f'preserveAspectRatio="xMidYMid meet" xlink:href="{assets["Human"]}"/>')
     o.append(f'<image x="{R - rw:.1f}" y="{top:.1f}" width="{rw:.1f}" height="{hh:.1f}" '
              f'preserveAspectRatio="xMidYMid meet" xlink:href="{assets["Rice"]}"/>')
-    o.append(text(L + hw / 2, top + hh + 22, "Homo sapiens", LABEL + 1, style="italic"))
-    o.append(text(R - rw / 2, top + hh + 22, "Oryza sativa", LABEL + 1, style="italic"))
+    o.append(text(L + hw / 2, top + hh + 22, "Homo sapiens", TITLE, style="italic"))
+    o.append(text(R - rw / 2, top + hh + 22, "Oryza sativa", TITLE, style="italic"))
 
     m0, m1 = L + hw + 18, R - rw - 18          # middle column
     mc = (m0 + m1) / 2
@@ -392,26 +398,25 @@ def panel_c(assets: dict[str, str]) -> list[str]:
     o.append(f'<line x1="{X(0.5):.1f}" y1="{pt:.1f}" x2="{X(0.5):.1f}" y2="{ay:.1f}" stroke="#c3cdd5" stroke-width="1"/>')
     o.append(f'<line x1="{X(THRESHOLD):.1f}" y1="{pt:.1f}" x2="{X(THRESHOLD):.1f}" y2="{ay:.1f}" '
              f'stroke="{MUTED}" stroke-width="1.1" stroke-dasharray="4 3"/>')
-    o.append(text(X(0.5) + 3, pt + 10, "chance", SMALL, "start", fill=MUTED))
     o.append(text(X(THRESHOLD) - 5, pt + 10, "prespecified 0.80", SMALL, "end", fill=MUTED))
-    for key, col, y, lab in (("h2r", blue, pt + 40, "H. sapiens → O. sativa"),
-                             ("r2h", green, pt + 76, "O. sativa → H. sapiens")):
+    for key, col, y, lab in (("h2r", blue, pt + 40, "Human → rice"),
+                             ("r2h", green, pt + 76, "Rice → human")):
         est, lo, hi = AUROC[key]
-        o.append(text(X(0.5) + 8, y + 5, lab, SMALL + 1, "start", style="italic"))
+        o.append(text(X(0.5) + 8, y + 6, lab, SMALL, "start"))
         o.append(f'<line x1="{X(lo):.1f}" y1="{y:.1f}" x2="{X(hi):.1f}" y2="{y:.1f}" stroke="{col}" stroke-width="2.2"/>')
         for v in (lo, hi):
             o.append(f'<line x1="{X(v):.1f}" y1="{y - 6:.1f}" x2="{X(v):.1f}" y2="{y + 6:.1f}" stroke="{col}" stroke-width="1.8"/>')
         o.append(f'<circle cx="{X(est):.1f}" cy="{y:.1f}" r="6" fill="{col}" stroke="white" stroke-width="1.4"/>')
-        o.append(text(X(hi) + 8, y + 5.5, f"{est:.2f}", LABEL + 1, "start", weight=700, fill=col))
-        o.append(text(X(hi) + 46, y + 5, f"({lo:.2f}–{hi:.2f})", SMALL, "start", fill=MUTED))
+        o.append(text(X(hi) + 8, y + 6, f"{est:.2f}", TITLE, "start", weight=700, fill=col))
+        o.append(text(X(hi) + 56, y + 6, f"({lo:.2f}–{hi:.2f})", SMALL, "start", fill=MUTED))
     o.append(f'<line x1="{x0:.1f}" y1="{ay:.1f}" x2="{x1:.1f}" y2="{ay:.1f}" stroke="{ARROW}" stroke-width="1"/>')
     for v in (0.5, 0.6, 0.7, 0.8, 0.9, 1.0):
         o.append(f'<line x1="{X(v):.1f}" y1="{ay:.1f}" x2="{X(v):.1f}" y2="{ay + 4:.1f}" stroke="{ARROW}" stroke-width="1"/>')
-        o.append(text(X(v), ay + 17, f"{v:.1f}", SMALL, fill=MUTED))
-    o.append(text(x1, ay - 6, "AUROC", SMALL, "end", weight=700))
+        o.append(text(X(v), ay + 20, f"{v:.1f}", SMALL, fill=MUTED))
+    o.append(text((x0 + x1) / 2, ay + 40, "AUROC", SMALL, weight=700))
 
     # bottom arrow: rice-trained model predicts human
-    yb = ay + 44
+    yb = ay + 56
     o.append(f'<path d="M{m1:.1f} {yb:.1f} L{m0:.1f} {yb:.1f}" stroke="{green}" stroke-width="2.2" '
              f'fill="none" marker-end="url(#arrowgreen)"/>')
     o.append(text(mc, yb + 22, 'Trained on <tspan font-style="italic">O. sativa</tspan> → '
@@ -437,7 +442,7 @@ def main() -> None:
 
     parts = [
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
-        'width="3000" height="2100" viewBox="0 0 1500 1050">',
+        'width="174mm" height="121.8mm" viewBox="0 0 1500 1050">',
         "<title>Figure 1</title>",
         "<desc>Figure 1 concept, version 2. OGT dimer rendered from PDB 7YEA with ligands placed by "
         "superposition of PDB 3PE4; glycopeptide rendered from PDB 5UN8 chain E; schematic protein, "
@@ -450,15 +455,15 @@ def main() -> None:
         *panel_c(assets),
         "</svg>",
     ]
-    svg = "\n".join(parts)
+    svg = despace("\n".join(parts))
     OUT.with_suffix(".svg").write_text(svg)
-    subprocess.run(["rsvg-convert", "-f", "pdf", "--dpi-x", "300", "--dpi-y", "300", "-o", str(OUT.with_suffix(".pdf")),
+    subprocess.run(["rsvg-convert", "-f", "pdf", "-o", str(OUT.with_suffix(".pdf")),
                     str(OUT.with_suffix(".svg"))], check=True)
-    subprocess.run(["rsvg-convert", "-b", "white", "-w", "3000", "-h", "2100", "-o",
+    subprocess.run(["rsvg-convert", "-b", "white", "--dpi-x", "1000", "--dpi-y", "1000", "-o",
                     str(OUT.with_suffix(".png")), str(OUT.with_suffix(".svg"))], check=True)
     (HERE / "Assembly_Record.json").write_text(json.dumps({
         "built_by": "build_figure_1_concept.py",
-        "canvas_viewbox": [1500, 1050], "png_pixels": [3000, 2100], "print_inches": [10, 7],
+        "canvas_viewbox": [1500, 1050], "png_dpi": 1000, "print_mm": [174, 121.8],
         "panel_A_structure": "PDB 7YEA full-length OGT homodimer (render_ogt_assembly.py); UDP and "
                              "acceptor peptide from PDB 3PE4 superposed per protomer",
         "panel_A_map": "data/substrate_map.json from compute_substrate_map.py (3,532 proteins with "

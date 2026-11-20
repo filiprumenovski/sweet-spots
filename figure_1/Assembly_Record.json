@@ -4,13 +4,10 @@
     1500,
     1050
   ],
-  "png_pixels": [
-    3000,
-    2100
-  ],
-  "print_inches": [
-    10,
-    7
+  "png_dpi": 1000,
+  "print_mm": [
+    174,
+    121.8
   ],
   "panel_A_structure": "PDB 7YEA full-length OGT homodimer (render_ogt_assembly.py); UDP and acceptor peptide from PDB 3PE4 superposed per protomer",
   "panel_A_map": "data/substrate_map.json from compute_substrate_map.py (3,532 proteins with validated O-GlcNAc sites; UniProt reviewed human subcellular locations)",

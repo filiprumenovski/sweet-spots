@@ -1,6 +1,6 @@
 # Sweet spots
 
-[![Release: v1.1.1](https://img.shields.io/badge/release-v1.1.1-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.1.1)
+[![Release: v1.1.2](https://img.shields.io/badge/release-v1.1.2-2F6F9F)](https://github.com/filiprumenovski/sweet-spots/releases/tag/v1.1.2)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21922595.svg)](https://doi.org/10.5281/zenodo.21922595)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Snakemake 9.17](https://img.shields.io/badge/Snakemake-9.17-039475)](https://snakemake.readthedocs.io/)
@@ -80,7 +80,7 @@ Nothing is installed outside the `sweet-spots` folder.
 | `workflow/`, `src/`, `config/` | Snakemake workflow, analysis code and parameters |
 | `results/` | Retained analyses, tables, figures and audit (`./reproduce` recomputes them) |
 | `reference/` | Archived values the audit compares against |
-| `assets/review_figures/` | Designed figures; review 1–5 are paper Figures 2–6, review S1, S4, S3, S2 are paper Figures S1–S4 |
+| `assets/review_figures/` | Designed figures; review 1–5 are paper Figures 2–6, review S1, S4, S3, S2 are paper Figures S1–S4. `python3 scripts/render_submission_figures.py assets/review_figures OUT` renders them at 174 mm on one Arial type scale (8/7/6.5/6 pt) |
 | `figure_1/` | Build for paper Figure 1 ([instructions](figure_1/README.md)) |
 | `docs/input_data.md` | Input sources, versions, checksums and licenses |
 

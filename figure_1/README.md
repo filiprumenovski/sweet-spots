@@ -7,8 +7,8 @@ final assembly reads is in this folder. Running
 python3 build_figure_1_concept.py
 ```
 
-writes `Figure_1_Concept_v2.svg`, `.pdf` and `.png`. It needs Pillow and `rsvg-convert`. The SVG
-is byte-identical to the submitted Figure 1.
+writes `Figure_1_Concept_v2.svg`, `.pdf` and a 1000-dpi `.png` at Cell Press full width (174 mm). It needs
+Pillow and `rsvg-convert`. The SVG is byte-identical to the submitted Figure 1.
 
 ## Panels and their inputs
 
